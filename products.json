@@ -4,26 +4,17 @@
 		"description": "Este es un producto de prueba",
 		"price": 200,
 		"thumbnail": "Sin imagen.",
-		"code": "abc1234",
+		"code": "abc123",
 		"stock": 25,
 		"id": 1
-	},
-	{
+	}
+]	{
 		"title": "Producto prueba 2",
 		"description": "Este es un producto de prueba, otra vez.",
 		"price": 220,
 		"thumbnail": "Sin imagen.",
-		"code": "abc123",
+		"code": "abc1234",
 		"stock": 27,
 		"id": 2
-	},
-	{
-		"title": "Producto prueba 3",
-		"description": "Este es un producto de prueba... mas.",
-		"price": 280,
-		"thumbnail": "Sin imagen.",
-		"code": "abc15",
-		"stock": 17,
-		"id": 3
 	}
 ]

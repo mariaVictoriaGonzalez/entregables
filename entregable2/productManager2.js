@@ -7,12 +7,12 @@ class ProductManager {
         if(fs.existsSync(this.path)){
             try{
                 this.getProducts();
-                this.products = [];
             } catch (error){
                 console.log(error)
             }
         } else{
             this.products = [];
+            this.saveFile();
         }
     }
 
@@ -28,10 +28,15 @@ class ProductManager {
     getProducts() {
         try {
             const data = fs.readFileSync(this.path, "utf-8");
-            this.products = JSON.parse(data);
-            return console.log(this.products);
+            if (data.trim() === ""){
+                this.products = [];
+            } else{
+                this.products = JSON.parse(data);
+            }
+            return this.products;
         } catch (error) {
             console.log("Error al recuperar productos.");
+            console.log(error)
         }
     }
 
@@ -63,6 +68,34 @@ class ProductManager {
             return searchedProduct;
         }
     }
+
+    async deleteProduct(id){
+        const index = this.products.findIndex((product) => product.id === id)
+
+        if(index ===-1){
+            return console.log("El producto no existe.")
+        }
+
+        try {
+            this.products.splice(index,1);
+            await this.saveFile()
+            console.log("Producto eliminado.")
+        } catch(error) {
+            console.log("Hubo un error al borrar el producto.")
+        }
+    }
+
+    updateProduct(id,updatedProduct){
+        const index = this.products.findIndex((product) => product.id === id);
+
+        if(index === -1){
+            return console.log("El producto no existe.")
+        } else{
+            this.products[index] = {...this.products[index], ...updatedProduct};
+            this.saveFile();
+            console.log("El producto fue actualizado.")
+        }
+    }
 }
 
 class Product {
@@ -80,26 +113,35 @@ class Product {
 // Tests
 
 const productManager = new ProductManager();
+const retrieveProducts = productManager.getProducts();
+
+console.log(retrieveProducts)
 
 console.log("Agregando producto de prueba...");
 productManager.addProduct(
-    new Product("Producto prueba", "Este es un producto de prueba", 200, "Sin imagen.", "abc1234", 25, 1)
+    new Product("Producto prueba", "Este es un producto de prueba", 200, "Sin imagen.", "abc123", 25)
 );
 
 productManager.addProduct(
-    new Product("Producto prueba 2", "Este es un producto de prueba, otra vez.", 220, "Sin imagen.", "abc123", 27, 2)
+    new Product("Producto prueba 2", "Este es un producto de prueba, otra vez.", 220, "Sin imagen.", "abc1234", 27)
 );
 
 console.log("Recuperando productos...");
-productManager.getProducts();
+console.log(retrieveProducts)
 
-console.log("Buscando producto con el id: 1 ......", productManager.getProductById(1));
+/*console.log("Buscando producto con el id: 1 ......", productManager.getProductById(1));
 console.log("Buscando producto con el id: 1247 ......", productManager.getProductById(1247));
 
-productManager.addProduct(
-    new Product("Producto prueba 3", "Este es un producto de prueba... mas.", 280, "Sin imagen.", "abc1234", 17, 3)
+productManager.updateProduct(
+    1,
+    new Product("Producto actualizado", "Este es un producto actualizado", 270, "Sin imagen.", "abc12345", 30)
 );
 
 console.log("Recuperando productos...");
 productManager.getProducts();
 
+console.log("Borrando el producto con el id: 2 ......");
+productManager.deleteProduct(2)
+
+console.log("Recuperando productos...");
+productManager.getProducts();*/
