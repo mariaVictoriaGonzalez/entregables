@@ -1,14 +1,14 @@
 [
 	{
-		"title": "Producto prueba",
-		"description": "Este es un producto de prueba",
-		"price": 200,
+		"title": "Producto actualizado",
+		"description": "Este es un producto actualizado",
+		"price": 270,
 		"thumbnail": "Sin imagen.",
-		"code": "abc123",
-		"stock": 25,
+		"code": "abc12345",
+		"stock": 30,
 		"id": 1
-	}
-]	{
+	},
+	{
 		"title": "Producto prueba 2",
 		"description": "Este es un producto de prueba, otra vez.",
 		"price": 220,
@@ -16,5 +16,14 @@
 		"code": "abc1234",
 		"stock": 27,
 		"id": 2
+	},
+	{
+		"title": "Producto prueba 3",
+		"description": "Este es un producto de prueba más, otra vez.",
+		"price": 270,
+		"thumbnail": "Sin imagen.",
+		"code": "abc12345",
+		"stock": 37,
+		"id": 3
 	}
 ]

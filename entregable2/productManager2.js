@@ -91,7 +91,8 @@ class ProductManager {
         if(index === -1){
             return console.log("El producto no existe.")
         } else{
-            this.products[index] = {...this.products[index], ...updatedProduct};
+            const {id, ...restOfProduct} = updatedProduct
+            this.products[index] = {...this.products[index], ...restOfProduct};
             this.saveFile();
             console.log("El producto fue actualizado.")
         }
@@ -126,10 +127,14 @@ productManager.addProduct(
     new Product("Producto prueba 2", "Este es un producto de prueba, otra vez.", 220, "Sin imagen.", "abc1234", 27)
 );
 
+productManager.addProduct(
+    new Product("Producto prueba 3", "Este es un producto de prueba más, otra vez.", 270, "Sin imagen.", "abc12345", 37)
+);
+
 console.log("Recuperando productos...");
 console.log(retrieveProducts)
 
-/*console.log("Buscando producto con el id: 1 ......", productManager.getProductById(1));
+console.log("Buscando producto con el id: 2 ......", productManager.getProductById(2));
 console.log("Buscando producto con el id: 1247 ......", productManager.getProductById(1247));
 
 productManager.updateProduct(
@@ -138,9 +143,9 @@ productManager.updateProduct(
 );
 
 console.log("Recuperando productos...");
-productManager.getProducts();
+console.log(retrieveProducts)
 
-console.log("Borrando el producto con el id: 2 ......");
+/*console.log("Borrando el producto con el id: 2 ......");
 productManager.deleteProduct(2)
 
 console.log("Recuperando productos...");
