@@ -2,15 +2,15 @@ const fs = require("fs");
 
 class ProductManager {
     constructor() {
-        this.path = "./products.json";
+        this.path = "./entregable2/products.json";
 
-        if(fs.existsSync(this.path)){
-            try{
+        if (fs.existsSync(this.path)) {
+            try {
                 this.getProducts();
-            } catch (error){
-                console.log(error)
+            } catch (error) {
+                console.log(error);
             }
-        } else{
+        } else {
             this.products = [];
             this.saveFile();
         }
@@ -18,7 +18,11 @@ class ProductManager {
 
     async saveFile() {
         try {
-            await fs.promises.writeFile(this.path, JSON.stringify(this.products, null, "\t"));
+            await fs.promises.writeFile(
+                this.path,
+                JSON.stringify(this.products, null, "\t"),
+                "utf-8"
+            );
             console.log("Archivo guardado correctamente.");
         } catch (error) {
             console.log(error);
@@ -28,35 +32,47 @@ class ProductManager {
     getProducts() {
         try {
             const data = fs.readFileSync(this.path, "utf-8");
-            if (data.trim() === ""){
+            if (data.trim() === "") {
                 this.products = [];
-            } else{
+            } else {
                 this.products = JSON.parse(data);
             }
             return this.products;
         } catch (error) {
             console.log("Error al recuperar productos.");
-            console.log(error)
+            console.log(error);
         }
     }
 
-    addProduct(product) {
-        if (!product || !product.title || !product.description || !product.price || !product.thumbnail || !product.code || !product.stock) {
+    async addProduct(product) {
+        if (
+            !product ||
+            !product.title ||
+            !product.description ||
+            !product.price ||
+            !product.thumbnail ||
+            !product.code ||
+            !product.stock
+        ) {
             return "Faltan datos para agregar el producto.";
+        }
+
+        const existingProduct = this.products.find((p) => p.code === product.code);
+
+        if (existingProduct) {
+            console.log(
+                "El código de producto ya existe. No se agregará el producto."
+            );
+            return;
         }
 
         if (!product.id) {
             product.id = this.products.length + 1;
         }
 
-        if (this.products.find((p) => p.code === product.code)) {
-            product.code = "abc" + Math.trunc(Math.random() * 100);
-            console.log("El código de producto ya existe. Se agregará el producto con un código generado automáticamente...");
-        }
-
         this.products.push(product);
 
-        this.saveFile();
+        await this.saveFile();
     }
 
     getProductById(id) {
@@ -69,32 +85,29 @@ class ProductManager {
         }
     }
 
-    async deleteProduct(id){
-        const index = this.products.findIndex((product) => product.id === id)
+    async deleteProduct(id) {
+        const productToDelete = this.products.find((p) => p.id == id);
 
-        if(index ===-1){
-            return console.log("El producto no existe.")
-        }
+        if (productToDelete) {
+            const newArray = this.products.filter((p) => p.id != id);
 
-        try {
-            this.products.splice(index,1);
-            await this.saveFile()
-            console.log("Producto eliminado.")
-        } catch(error) {
-            console.log("Hubo un error al borrar el producto.")
+            this.products = newArray;
+            await this.saveFile();
+        } else {
+            console.log("Error al eliminar producto");
         }
     }
 
-    updateProduct(id,updatedProduct){
+    async updateProduct(id, updatedProduct) {
         const index = this.products.findIndex((product) => product.id === id);
 
-        if(index === -1){
-            return console.log("El producto no existe.")
-        } else{
-            const {id, ...restOfProduct} = updatedProduct
-            this.products[index] = {...this.products[index], ...restOfProduct};
-            this.saveFile();
-            console.log("El producto fue actualizado.")
+        if (index === -1) {
+            return console.log("El producto no existe.");
+        } else {
+            const { id, ...restOfProduct } = updatedProduct;
+            this.products[index] = { ...this.products[index], ...restOfProduct };
+            await this.saveFile();
+            console.log("El producto fue actualizado.");
         }
     }
 }
@@ -113,40 +126,75 @@ class Product {
 
 // Tests
 
-const productManager = new ProductManager();
-const retrieveProducts = productManager.getProducts();
+async function lanzarTests() {
+    const productManager = new ProductManager();
 
-console.log(retrieveProducts)
+    console.log("Agregando producto de prueba...");
+    await productManager.addProduct(
+        new Product(
+            "Producto prueba",
+            "Este es un producto de prueba",
+            200,
+            "Sin imagen.",
+            "abc123",
+            25
+        )
+    );
 
-console.log("Agregando producto de prueba...");
-productManager.addProduct(
-    new Product("Producto prueba", "Este es un producto de prueba", 200, "Sin imagen.", "abc123", 25)
-);
+    await productManager.addProduct(
+        new Product(
+            "Producto prueba 2",
+            "Este es un producto de prueba, otra vez.",
+            220,
+            "Sin imagen.",
+            "abc1234",
+            27
+        )
+    );
 
-productManager.addProduct(
-    new Product("Producto prueba 2", "Este es un producto de prueba, otra vez.", 220, "Sin imagen.", "abc1234", 27)
-);
+    await productManager.addProduct(
+        new Product(
+            "Producto prueba 3",
+            "Este es un producto de prueba más, otra vez.",
+            270,
+            "Sin imagen.",
+            "abc12345",
+            37
+        )
+    );
 
-productManager.addProduct(
-    new Product("Producto prueba 3", "Este es un producto de prueba más, otra vez.", 270, "Sin imagen.", "abc12345", 37)
-);
+    console.log("Recuperando productos...");
+    console.log(productManager.products);
 
-console.log("Recuperando productos...");
-console.log(retrieveProducts)
+    console.log(
+        "Buscando producto con el id: 2 ......",
+        productManager.getProductById(2)
+    );
+    console.log(
+        "Buscando producto con el id: 1247 ......",
+        productManager.getProductById(1247)
+    );
 
-console.log("Buscando producto con el id: 2 ......", productManager.getProductById(2));
-console.log("Buscando producto con el id: 1247 ......", productManager.getProductById(1247));
+    await productManager.updateProduct(
+        1,
+        new Product(
+            "Producto actualizado",
+            "Este es un producto actualizado",
+            270,
+            "Sin imagen.",
+            "abc12345",
+            30
+        )
+    );
 
-productManager.updateProduct(
-    1,
-    new Product("Producto actualizado", "Este es un producto actualizado", 270, "Sin imagen.", "abc12345", 30)
-);
+    console.log("Recuperando productos...");
+    console.log(productManager.products);
 
-console.log("Recuperando productos...");
-console.log(retrieveProducts)
+    console.log("Borrando el producto con el id: 2 ......");
+    await productManager.deleteProduct(2);
 
-/*console.log("Borrando el producto con el id: 2 ......");
-productManager.deleteProduct(2)
+    console.log("Recuperando productos...");
+    console.log(productManager.products);
+}
 
-console.log("Recuperando productos...");
-productManager.getProducts();*/
+lanzarTests();
