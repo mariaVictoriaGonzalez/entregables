@@ -198,3 +198,5 @@ async function lanzarTests() {
 }
 
 lanzarTests();
+
+export default ProductManager;
