@@ -1,8 +1,8 @@
-const fs = require("fs");
+import fs from 'fs'
 
 class ProductManager {
     constructor() {
-        this.path = "./entregable3/products.json";
+        this.path = "./products.json";
 
         if (fs.existsSync(this.path)) {
             try {
@@ -29,7 +29,7 @@ class ProductManager {
         }
     }
 
-    getProducts() {
+    async getProducts() {
         try {
             const data = fs.readFileSync(this.path, "utf-8");
             if (data.trim() === "") {
@@ -126,7 +126,7 @@ class Product {
 
 // Tests
 
-async function lanzarTests() {
+/*async function lanzarTests() {
     const productManager = new ProductManager();
 
     console.log("Agregando producto de prueba...");
@@ -197,6 +197,6 @@ async function lanzarTests() {
     console.log(productManager.products);
 }
 
-lanzarTests();
+lanzarTests();*/
 
 export default ProductManager;

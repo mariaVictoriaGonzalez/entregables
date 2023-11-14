@@ -1,5 +1,5 @@
 import express, { request, response } from 'express';
-import ProductManager from './productManager3'
+import ProductManager from './productManager.js'
 
 const nuevoProductManager = new ProductManager();
 const app = express();
@@ -15,8 +15,8 @@ app.get("/products", async (request, response) => {
     const limitNumber = Number(limit);
     const products = await nuevoProductManager.getProducts()
 
-    if (limitNumber) {
-        response.send(products.splice(limitNumber, 1))
+    if (limit) {
+        response.send(products.splice(0, limitNumber))
     } else {
         response.json(products);
     }
@@ -26,8 +26,9 @@ app.get("/products", async (request, response) => {
 
 app.get("/products/:id", async (request, response) => {
     const { id } = request.params;
+    const numberId = Number(id)
 
-    const product = await nuevoProductManager.getProductById(id)
+    const product = await nuevoProductManager.getProductById(numberId)
 
     if (product) {
         return response.json(product)
