@@ -1,0 +1,35 @@
+[
+	{
+		"title": "Product 1",
+		"description": "Este es un producto de prueba 1",
+		"price": 200,
+		"thumbnail": "Sin imagen.",
+		"code": "plo573",
+		"stock": 31,
+		"status": true,
+		"category": "category1",
+		"id": 1
+	},
+	{
+		"title": "Product 2",
+		"description": "Este es un producto de prueba 2",
+		"price": 250,
+		"thumbnail": "Sin imagen.",
+		"code": "off573",
+		"stock": 38,
+		"status": true,
+		"category": "category2",
+		"id": 2
+	},
+	{
+		"title": "Product 3",
+		"description": "Este es un producto de prueba 3",
+		"price": 250,
+		"thumbnail": "Sin imagen.",
+		"code": "ppo573",
+		"stock": 35,
+		"status": true,
+		"category": "category2",
+		"id": 3
+	}
+]

@@ -3,7 +3,7 @@ import ProductManager from './productManager.js'
 
 const nuevoProductManager = new ProductManager();
 const app = express();
-const PORT = 8080
+const PORT = 5050
 
 
 app.get("/", (request, response) => {
