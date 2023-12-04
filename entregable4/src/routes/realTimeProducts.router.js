@@ -7,7 +7,8 @@ const nuevoProductManager = new ProductManager("../products.json");
 
 router.get("/", (request, response) => {
     response.render("realTimeProducts", {
-        title: "Agregar productos en tiempo real."
+        title: "Agregar productos en tiempo real.",
+        fileCss: "../css/styles.css"
     });
 });
 

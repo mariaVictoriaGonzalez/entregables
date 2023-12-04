@@ -20,7 +20,8 @@ router.get("/", async (request, response) => {
         }
         response.render("home", {
             title: "Productos",
-            productsToRender: productsToRender})
+            productsToRender: productsToRender,
+            fileCss:"../css/styles.css"})
     } catch {
         console.log(error);
         response.status(500).send("Internal Server Error");
