@@ -22,80 +22,14 @@
 		"id": 2
 	},
 	{
-		"title": "Product 3",
-		"description": "Este es un producto de prueba 3",
-		"price": 250,
-		"thumbnail": "Sin imagen.",
-		"code": "ppo573",
-		"stock": 35,
-		"status": true,
-		"category": "category2",
-		"id": 3
-	},
-	{
-		"title": "ad",
-		"description": "ad",
-		"price": 5,
-		"thumbnail": "a",
-		"code": "6",
-		"stock": 6,
+		"title": "Product 4",
+		"description": "Descripcion de producto4",
+		"price": 300,
+		"thumbnail": "imagen.png",
+		"code": "adc569",
+		"stock": 25,
 		"status": "true",
-		"category": "6",
+		"category": "category1",
 		"id": 4
-	},
-	{
-		"title": "a",
-		"description": "a",
-		"price": 4,
-		"thumbnail": "4",
-		"code": "4",
-		"stock": 4,
-		"status": "true",
-		"category": "4",
-		"id": 5
-	},
-	{
-		"title": "44",
-		"description": "44",
-		"price": 44,
-		"thumbnail": "44",
-		"code": "44",
-		"stock": 44,
-		"status": "true",
-		"category": "44",
-		"id": 6
-	},
-	{
-		"title": "99",
-		"description": "4499",
-		"price": 99,
-		"thumbnail": "99",
-		"code": "99",
-		"stock": 99,
-		"status": "true",
-		"category": "99",
-		"id": 7
-	},
-	{
-		"title": "222",
-		"description": "222",
-		"price": 222,
-		"thumbnail": "222",
-		"code": "222",
-		"stock": 222,
-		"status": "true",
-		"category": "22",
-		"id": 8
-	},
-	{
-		"title": "9999",
-		"description": "999999",
-		"price": 999999,
-		"thumbnail": "9999",
-		"code": "999999",
-		"stock": 99999,
-		"status": "true",
-		"category": "999",
-		"id": 9
 	}
 ]

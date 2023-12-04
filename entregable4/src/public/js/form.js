@@ -47,8 +47,17 @@ function addProductToUI(product) {
             Stock: ${product.stock} -
             Estado: ${product.status} -
             Categoría: ${product.category} -
-            <button id="button-${product.id}">Eliminar</button>
+            <button class="delete-button" data-product-id="${product.id}">Eliminar</button>
         </p>
     `;
     productsContainer.appendChild(productElement);
 }
+
+productsContainer.addEventListener("click", (event) => {
+    if (event.target.classList.contains("delete-button")) {
+        const productId = event.target.dataset.productId;
+        socket.emit("delete_product", productId);
+    }
+});
+
+

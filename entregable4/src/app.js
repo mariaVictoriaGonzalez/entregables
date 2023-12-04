@@ -56,4 +56,11 @@ io.on("connection", async socket => {
         }
     });
     socket.emit("products", await nuevoProductManager.getProducts());
+
+    socket.on("delete_product", async (productId) => {
+        await nuevoProductManager.deleteProduct(productId);
+        io.emit("products", await nuevoProductManager.getProducts());
+    });
 });
+
+
