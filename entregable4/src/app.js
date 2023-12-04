@@ -5,6 +5,8 @@ import realTimeProductsRouter from './routes/realTimeProducts.router.js';
 import handlebars from 'express-handlebars';
 import __dirname from './utils.js';
 import { Server } from 'socket.io';
+import ProductManager from "./productManager.js";
+import { Product } from './productManager.js';
 
 const app = express();
 const PORT = 8080;
@@ -28,9 +30,30 @@ app.use(express.static(`${__dirname}/public`));
 
 const httpServer = app.listen(PORT, () => console.log("Servidor en el puerto 8080 esta activo."));
 
-const socketServer = new Server(httpServer);
+const io = new Server(httpServer);
+const nuevoProductManager = new ProductManager("../products.json");
 
-socketServer.on("connection", socket => {
-    console.log("Cliente conectado")
+io.on("connection", async socket => {
+    console.log("Cliente conectado");
+
+    socket.on("product_send", async (data) => {
+        try {
+            const product = new Product(data.title,
+                data.description,
+                Number(data.price),
+                data.thumbnail,
+                data.code,
+                Number(data.stock),
+                data.status,
+                data.category
+                );
+            await nuevoProductManager.addProduct(product);
+            io.emit("products", await nuevoProductManager.getProducts());
+            console.log(product)
+            console.log(nuevoProductManager.getProducts())
+        } catch (error) {
+            console.log(error)
+        }
+    });
+    socket.emit("products", await nuevoProductManager.getProducts());
 });
-

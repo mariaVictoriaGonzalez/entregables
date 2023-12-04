@@ -1,18 +1,36 @@
-import { Router, request, response } from "express";
+import { Router } from 'express';
+import ProductManager from "../productManager.js";
+import { Product } from "../productManager.js";
 
 const router = Router();
+const nuevoProductManager = new ProductManager("../products.json");
 
 router.get("/", (request, response) => {
     response.render("realTimeProducts", {
-        title:"Agregar productos en tiempo real."
-    })
-})
+        title: "Agregar productos en tiempo real."
+    });
+});
 
-router.post("/", (request, response) => {
-    const formData = request.body;
+router.post("/", async (request, response) => {
+    const { title, description, price, thumbnail, code, stock, status, category } = request.body;
 
+    const product = new Product(title, description, price, thumbnail, code, stock, status, category);
 
-    response.send("Form submitted successfully!");
+    try {
+        await nuevoProductManager.addProduct(product);
+        response.status(201).json({
+            data: {
+                message: "Producto creado",
+            }
+        });
+    } catch (e) {
+        response.status(500).json({
+            error: {
+                message: e.message,
+            }
+        });
+    }
 });
 
 export default router;
+

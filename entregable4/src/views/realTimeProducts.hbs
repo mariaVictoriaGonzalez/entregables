@@ -5,7 +5,7 @@
 <div>
     <h2>Crear Producto</h2>
 
-    <form action="/realtimeproducts" method="post">
+    <form action="/realtimeproducts" method="post" id="realTimeProducts">
         <label for="title">Título:</label>
         <input type="text" id="title" name="title" required>
 
@@ -16,7 +16,7 @@
         <input type="number" id="price" name="price" step="0.01" required>
 
         <label for="thumbnail">URL de la Miniatura:</label>
-        <input type="url" id="thumbnail" name="thumbnail" required>
+        <input type="text" id="thumbnail" name="thumbnail" required>
 
         <label for="code">Código:</label>
         <input type="text" id="code" name="code" required>
@@ -35,8 +35,11 @@
 
         <button type="submit">Crear Producto</button>
     </form>
+</div>
+
+<div id="products">
 
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/src/public/js/form.js"></script>
+<script src="/js/form.js"></script>
