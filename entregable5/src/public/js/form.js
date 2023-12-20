@@ -41,13 +41,13 @@ function addProductToUI(product) {
         <p>
             Título: ${product.title} -
             Descripción: ${product.description} -
-            Precio: ${product.price} -
+            Precio: $ ${product.price} -
             Imagen: ${product.thumbnail} -
             Código: ${product.code} -
             Stock: ${product.stock} -
             Estado: ${product.status} -
             Categoría: ${product.category} -
-            <button class="delete-button" data-product-id="${product.id}">Eliminar</button>
+            <button class="delete-button" data-product-id="${product._id}">Eliminar</button>
         </p>
     `;
     productsContainer.appendChild(productElement);

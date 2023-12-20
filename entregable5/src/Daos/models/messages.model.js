@@ -5,6 +5,6 @@ const chatSchema = new Schema({
     message: { type:String, required:true }
 });
 
-const chatModel = model("chat", chatSchema);
+const chatModel = model("messages", chatSchema);
 
 export { chatModel };

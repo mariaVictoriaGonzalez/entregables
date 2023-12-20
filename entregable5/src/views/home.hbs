@@ -4,10 +4,12 @@
     <ol>
         {{#each productsToRender}}
         <li>
-            <h2>Producto: {{this.name}}</h2>
+            <h2>Producto: {{this.title}}</h2>
             <p>Descripción: {{this.description}}</p>
             <p>Precio: $ {{this.price}}</p>
+            <button onclick="addToCart('{{this.title}}', '{{this._id}}', {{this.price}})">Agregar al Carrito</button>
         </li>
         {{/each}}
     </ol>
 </div>
+

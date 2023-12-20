@@ -7,8 +7,7 @@
 		"code": "plo573",
 		"stock": 31,
 		"status": true,
-		"category": "category1",
-		"id": 1
+		"category": "category1"
 	},
 	{
 		"title": "Product 2",
@@ -18,8 +17,7 @@
 		"code": "off573",
 		"stock": 38,
 		"status": true,
-		"category": "category2",
-		"id": 2
+		"category": "category2"
 	},
 	{
 		"title": "Product 4",
@@ -29,7 +27,6 @@
 		"code": "adc569",
 		"stock": 25,
 		"status": "true",
-		"category": "category1",
-		"id": 4
+		"category": "category1"
 	}
 ]

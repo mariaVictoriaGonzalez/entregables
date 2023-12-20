@@ -1,15 +1,17 @@
 import { Router, request, response } from "express";
-import { Cart } from "../cartManager.js";
-import { CartManager } from "../cartManager.js";
+import cartsDao from '../Daos/carts.dao.js'
 
 const router = Router();
-const nuevoCartManager = new CartManager();
 
 router.get("/", async (request, response) => {
     try {
-        await nuevoCartManager.addCart();
-        response.json({
-            message: "Carrito creado."
+        await cartsDao.createCart();
+        const carts = await cartsDao.getAllCarts();
+
+        response.render("carts", {
+            title: "Carritos",
+            fileCss: "../css/styles.css"
+
         });
     } catch (error) {
         console.error(error);
@@ -19,9 +21,8 @@ router.get("/", async (request, response) => {
 
 router.get("/:cid", async (request, response) => {
     const { cid } = request.params;
-    const numberCid = Number(cid)
 
-    const cart = await nuevoCartManager.getCartById(numberCid)
+    const cart = await cartsDao.getCartById(cid)
 
     if (cart) {
         return response.json(cart)
@@ -33,7 +34,7 @@ router.get("/:cid", async (request, response) => {
 
 router.post("/:cid/product/:pid", async (request, response) => {
     const { cid, pid } = request.params;
-    await nuevoCartManager.addProductToCart(Number(cid), Number(pid))
+    await cartsDao.addProductToCart(Number(cid), Number(pid))
     
     response.json({message: `Productocon ID ${pid} agregado al carrito nro ${cid}`})
 })

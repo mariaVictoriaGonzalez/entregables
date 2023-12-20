@@ -1,80 +1,75 @@
-import { Router, request, response } from "express";
-import ProductManager from "../productManager.js";
-import { Product } from "../productManager.js";
+import { Router } from "express";
+import productsDao from "../daos/products.dao.js";
 
 const router = Router();
-const nuevoProductManager = new ProductManager("../products.json");
 
 router.get("/", async (request, response) => {
     const { limit } = request.query;
     const limitNumber = Number(limit);
-    const products = await nuevoProductManager.getProducts();
-    console.log("ingreso a productos");
-    let productsToRender;
-
+    
     try {
+        const products = await productsDao.getAllProducts();
+
+        let productsToRender;
         if (limit) {
-            productsToRender = products.splice(0, limitNumber)
+            productsToRender = products.slice(0, limitNumber);
         } else {
             productsToRender = products;
         }
+
         response.render("home", {
             title: "Productos",
             productsToRender: productsToRender,
-            fileCss:"../css/styles.css"})
-    } catch {
-        console.log(error);
+            fileCss: "../css/styles.css"
+        });
+    } catch (error) {
+        console.error("Error:", error);
         response.status(500).send("Internal Server Error");
     }
-
 });
-
 
 router.get("/:id", async (request, response) => {
     const { id } = request.params;
-    const numberId = Number(id)
 
-    const product = await nuevoProductManager.getProductById(numberId)
+    try {
+        const product = await productsDao.getProductById(id);
 
-    if (product) {
-        return response.json(product)
-    } else {
-        return response.send("ERROR: producto no encontrado.")
+        if (product) {
+            return response.json(product);
+        } else {
+            return response.send("ERROR: producto no encontrado.");
+        }
+    } catch (error) {
+        return response.status(500).json({
+            error: error.message
+        });
     }
-
-})
+});
 
 router.post("/", async (request, response) => {
     const { title, description, price, thumbnail, code, stock, status, category } = request.body;
-
-    const product = new Product(title, description, price, thumbnail, code, stock, status, category);
+    const product = (title, description, price, thumbnail, code, stock, status, category);
 
     try {
-        await nuevoProductManager.addProduct(product)
+        await productsDao.createProduct(product);
         response.json({
             message: "Producto creado.",
             product,
-        })
+        });
     } catch (error) {
-        error: error.message
+        return response.status(500).json({
+            error: error.message
+        });
     }
-
-})
+});
 
 router.delete("/:id", async (request, response) => {
     const { id } = request.params;
-    const numberId = Number(id);
-
-    if (isNaN(numberId)) {
-        return response.json({
-            message: "Se necesita ingreso de un ID válido."
-        });
-    }
 
     try {
-        await nuevoProductManager.deleteProduct(numberId);
+        await productsDao.deleteProduct(id);
         response.json({
-            message: `Producto con ID ${numberId} eliminado.`,
+            message: `Producto con ID ${id} eliminado.`,
         });
     } catch (error) {
         if (error.code === 'ECONNRESET') {
@@ -93,14 +88,12 @@ router.delete("/:id", async (request, response) => {
 router.put("/:id", async (request, response) => {
     const { id } = request.params;
     const { title, description, price, thumbnail, code, stock, status, category } = request.body;
-    const updatedProduct = new Product(title, description, price, thumbnail, code, stock, status, category)
-
-    const numberId = Number(id);
+    const updatedProduct = new Product(title, description, price, thumbnail, code, stock, status, category);
 
     try {
-        await nuevoProductManager.updateProduct(numberId, updatedProduct);
+        await productsDao.updateProduct(id, updatedProduct);
         response.json({
-            message: `Producto con ID ${numberId} modificado.`,
+            message: `Producto con ID ${id} modificado.`,
             title,
             description,
             price,
@@ -110,11 +103,12 @@ router.put("/:id", async (request, response) => {
             status,
             category,
             id: numberId,
-        })
+        });
     } catch (error) {
-        error: error.message
+        return response.status(500).json({
+            error: error.message
+        });
     }
-
-})
+});
 
 export default router;
