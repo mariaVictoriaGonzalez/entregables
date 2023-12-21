@@ -1,6 +1,7 @@
 function initChat() {
     const socket = io();
     const messageInput = document.getElementById('message-input');
+    const userInput = document.getElementById('username-input');
     const sendButton = document.getElementById('send-button');
     const chatMessages = document.getElementById('chat-messages');
 
@@ -8,21 +9,23 @@ function initChat() {
         sendMessage();
     });
 
-    socket.on('chat message', (msg) => {
-        displayMessage(msg);
+    socket.on('chat message', (data) => {
+        displayMessage(data);
     });
 
     function sendMessage() {
         const message = messageInput.value;
-        if (message.trim() !== '') {
-            socket.emit('chat message', message);
+        const user = userInput.value;
+        if (message.trim() !== '' && user.trim() !== '') {
+            const data = { user, message };
+            socket.emit('chat message', data);
             messageInput.value = '';
         }
     }
 
-    function displayMessage(msg) {
+    function displayMessage(data) {
         const li = document.createElement('li');
-        li.textContent = msg;
+        li.textContent = `${data.user}: ${data.message}`;
         chatMessages.appendChild(li);
     }
 }
@@ -30,3 +33,4 @@ function initChat() {
 document.addEventListener('DOMContentLoaded', () => {
     initChat();
 });
+

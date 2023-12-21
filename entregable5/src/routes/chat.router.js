@@ -3,11 +3,23 @@ import chatDao from "../Daos/chat.dao.js";
 
 const router = Router();
 
-router.get("/", (request, response) => {
+router.get("/", async (request, response) => {    
     response.render("chat", {
         title: "Chat.",
         fileCss: "../css/styles.css"
     });
+    try {
+        await productsDao.createProduct(product);
+        response.json({
+            message: "Carrito creado.",
+            product,
+        });
+    } catch (error) {
+        return response.status(500).json({
+            error: error.message
+        });
+    }
+
 });
 
 router.post("/", async (request, response) => {
@@ -33,16 +45,16 @@ router.post("/", async (request, response) => {
 export default (io) => {
     io.on('connection', (socket) => {
         console.log('Usuario conectado');
-
-        socket.on('chat message', (msg) => {
-            console.log('Mensaje: ' + msg);
-            io.emit('chat message', msg);
+    
+        socket.on('chat message', (data) => {
+            console.log(`Mensaje: ${data.message} - Usuario: ${data.user}`);
+            io.emit('chat message', data);
         });
-
+    
         socket.on('disconnect', () => {
             console.log('Usuario desconectado');
         });
     });
-
+    
     return router;
 };
