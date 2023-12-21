@@ -13,7 +13,7 @@ class ProductDao {
     async getProductById(_id) {
         try {
             const objectId = new mongoose.Types.ObjectId(_id);
-            return await productModel.findById(objectId);
+            return await productModel.findById(_id);
         } catch (error) {
             throw new Error(`Error while fetching product by ID: ${error.message}`);
         }

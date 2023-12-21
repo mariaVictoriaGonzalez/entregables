@@ -114,16 +114,15 @@ router.put("/:id", async (request, response) => {
 
 router.post("/addToCart/:productId", async (request, response) => {
     const productId  = request.body;
-    await cartsDao.createCart();
 
     try {
+        await cartsDao.createCartAndAddProduct(productId);
         const product = await productsDao.getProductById(productId);
 
         if (!product) {
             return response.status(404).json({ error: "Producto no encontrado." });
         }
 
-        const cartId = "cart1"; 
         await cartsDao.addToCart(cartId, product);
 
         response.json({

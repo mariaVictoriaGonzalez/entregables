@@ -41,12 +41,17 @@ class CartDao {
         }
     };
 
-    async addToCart (cartId, product) {
-        const cart = await getCartById(cartId);
-        cart.products.push(product);
-    
-        await updateCart(cartId, cart);
-    };
+    async createCartAndAddProduct(productId) {
+        try {
+            // Crear un nuevo carrito con el producto
+            const newCart = await cartModel.create({ products: [productId] });
+
+            // Retornar el nuevo carrito creado
+            return newCart;
+        } catch (error) {
+            throw new Error(`Error creating cart and adding product: ${error.message}`);
+        }
+    }
 }
 
 export default new CartDao();
