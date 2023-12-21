@@ -2,6 +2,7 @@ import express from 'express';
 import productsRouter from './routes/products.router.js';
 import cartsRouter from './routes/carts.router.js';
 import realTimeProductsRouter from './routes/realTimeProducts.router.js';
+import chatRouter from './routes/chat.router.js'
 import handlebars from 'express-handlebars';
 import __dirname from './dirname.js';
 import { Server } from 'socket.io';
@@ -39,4 +40,6 @@ mongoose.connect(MONGODB_URI)
     .catch((err) => console.error('Error connecting to the database:', err));
 
     app.use('/api/realtimeproducts', realTimeProductsRouter(io));
+    app.use("/api/chat", chatRouter(io));
+
 

@@ -44,5 +44,7 @@ class ProductDao {
             throw new Error(`Error while deleting product: ${error.message}`);
         }
     }
+
+
 }
 export default new ProductDao();
