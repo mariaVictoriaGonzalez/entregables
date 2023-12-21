@@ -1,7 +1,7 @@
 <div>
     <h1>Lista de productos:</h1>
 
-    <form action="/addToCart" method="post" id="addProducts" enctype="application/x-www-form-urlencoded">
+    <form action="/addToCart/:productId" method="post" id="addProducts" enctype="application/x-www-form-urlencoded">
         {{#each productsToRender}}
         <li>
             <h2>Producto: {{this.title}}</h2>

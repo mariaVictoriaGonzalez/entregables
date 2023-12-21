@@ -1,25 +1,13 @@
-import { Router } from "express";
 import chatDao from "../Daos/chat.dao.js";
+import { Router } from "express";
 
 const router = Router();
 
-router.get("/", async (request, response) => {    
+router.get("/", (request, response) => {
     response.render("chat", {
         title: "Chat.",
-        fileCss: "../css/styles.css"
+        fileCss: "../css/styles.css",
     });
-    try {
-        await productsDao.createProduct(product);
-        response.json({
-            message: "Carrito creado.",
-            product,
-        });
-    } catch (error) {
-        return response.status(500).json({
-            error: error.message
-        });
-    }
-
 });
 
 router.post("/", async (request, response) => {
@@ -31,13 +19,13 @@ router.post("/", async (request, response) => {
         response.status(201).json({
             data: {
                 message: "Mensaje creado",
-            }
+            },
         });
     } catch (e) {
         response.status(500).json({
             error: {
                 message: e.message,
-            }
+            },
         });
     }
 });
@@ -45,16 +33,24 @@ router.post("/", async (request, response) => {
 export default (io) => {
     io.on('connection', (socket) => {
         console.log('Usuario conectado');
-    
-        socket.on('chat message', (data) => {
+
+        socket.on('chat message', async (data) => {
             console.log(`Mensaje: ${data.message} - Usuario: ${data.user}`);
+
+            try {
+                await chatDao.createMessage({ user: data.user, message: data.message });
+            } catch (error) {
+                console.error('Error al guardar el mensaje en la base de datos:', error);
+            }
+
             io.emit('chat message', data);
         });
-    
+
         socket.on('disconnect', () => {
             console.log('Usuario desconectado');
         });
     });
-    
+
     return router;
 };
+

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import productsDao from "../daos/products.dao.js";
+import cartsDao from "../Daos/carts.dao.js";
 
 const router = Router();
 
@@ -111,8 +112,9 @@ router.put("/:id", async (request, response) => {
     }
 });
 
-router.post("/addToCart", async (request, response) => {
-    const { productId } = request.body; 
+router.post("/addToCart/:productId", async (request, response) => {
+    const productId  = request.body;
+    await cartsDao.createCart();
 
     try {
         const product = await productsDao.getProductById(productId);

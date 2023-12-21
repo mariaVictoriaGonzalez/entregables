@@ -5,8 +5,6 @@ const router = Router();
 
 router.get("/", async (request, response) => {
     try {
-        const carts = await cartsDao.getAllCarts();
-
         response.render("carts", {
             title: "Carritos",
             fileCss: "../css/styles.css"

@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
     addButtons.forEach(button => {
         button.addEventListener("click", function() {
             const _id = button.getAttribute("data-id");
-
+            console.log(_id)
             addToCart(_id);
         });
     });
