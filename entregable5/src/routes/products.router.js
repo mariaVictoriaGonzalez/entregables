@@ -112,27 +112,5 @@ router.put("/:id", async (request, response) => {
     }
 });
 
-router.post("/:cid/products/:pid", async (request, response) => {
-    const productId  = request.body;
-    await cartsDao.createCartAndAddProduct(productId);
-
-    try {
-        const product = await productsDao.getProductById(productId);
-
-        if (!product) {
-            return response.status(404).json({ error: "Producto no encontrado." });
-        }
-
-        await cartsDao.addToCart(cartId, product);
-
-        response.json({
-            message: "Producto agregado al carrito exitosamente.",
-            product,
-        });
-    } catch (error) {
-        console.error("Error al agregar producto al carrito:", error);
-        response.status(500).json({ error: "Error interno del servidor." });
-    }
-});
 
 export default router;

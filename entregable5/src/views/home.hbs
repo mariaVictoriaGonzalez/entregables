@@ -1,16 +1,22 @@
 <div>
-    <h1>Lista de productos:</h1>
+  <h1>Lista de productos:</h1>
 
-    <form action="/products/addToCart/:productId" method="post" id="addProducts" enctype="application/x-www-form-urlencoded">
-        {{#each productsToRender}}
-        <li>
-            <h2>Producto: {{this.title}}</h2>
-            <p>Descripción: {{this.description}}</p>
-            <p>Precio: $ {{this.price}}</p>
-            <button class="addProductToCart" data-id="{{this._id}}" onclick="addToCart('{{this._id}}')" type="button">Agregar al Carrito</button>
-        </li>
-        {{/each}}
-    </form>
+  <ul>
+    {{#each productsToRender}}
+      <li>
+        <h2>Producto: {{this.title}}</h2>
+        <p>Descripción: {{this.description}}</p>
+        <p>Precio: $ {{this.price}}</p>
+        <button
+          class="addProductToCart"
+          data-cid="{{cartId}}"
+          data-pid="{{this._id}}"
+          onclick="addToCart('{{cartId}}', '{{this._id}}')"
+          type="button"
+        >Agregar al Carrito</button>
+      </li>
+    {{/each}}
+  </ul>
 </div>
 
 <script src="/js/add.products.js"></script>

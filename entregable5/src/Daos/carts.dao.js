@@ -1,5 +1,6 @@
 import { cartModel } from "./models/cart.model.js";
-import productsDao from "./products.dao.js"
+import productsDao from "./products.dao.js";
+import mongoose from "mongoose";
 
 class CartDao {
   async getAllCarts() {
@@ -9,6 +10,15 @@ class CartDao {
       throw new Error(`Error getting carts: ${error.message}`);
     }
   }
+
+  async createCart(cart) {
+    try {
+        return await cartModel.create(cart);
+    } catch (error) {
+        throw new Error(`Error while creating cart: ${error.message}`);
+    }
+}
+
 
   async getCartById(_id) {
     try {
@@ -36,20 +46,24 @@ class CartDao {
 
   async addProductToCart(cid, pid) {
     try {
-      const cartToUse = await cartModel.findById(cid);
+      let cartToUse;
+
+      if (mongoose.Types.ObjectId.isValid(cid)) {
+        cartToUse = await cartModel.findById(cid);
+      }
 
       if (!cartToUse) {
         const cart = {};
-
-        return await cartModel.create(cart);
+        cartToUse = await cartModel.create(cart);
       }
 
-      const productToAdd = await productsDao.findById(pid);
-      
+      const productToAdd = await productsDao.getProductById(pid);
+
       if (productToAdd) {
         const productIndex = cartToUse.products.findIndex(
           (element) => element.product === pid
         );
+
         if (productIndex !== -1) {
           cartToUse.products[productIndex].quantity += 1;
         } else {
@@ -57,7 +71,7 @@ class CartDao {
         }
       }
 
-      await cartModel.findByIdAndUpdate(cid, cartToUse);
+      await cartModel.findByIdAndUpdate(cartToUse._id, cartToUse);
 
       console.log("Product added to the cart.");
     } catch (error) {
