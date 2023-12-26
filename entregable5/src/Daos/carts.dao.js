@@ -44,6 +44,14 @@ class CartDao {
     }
   }
 
+  async deleteAllCarts() {
+    try {
+      return await cartModel.deleteMany();
+    } catch (error) {
+      throw new Error(`Error deleting cart: ${error.message}`);
+    }
+  }
+
   async addProductToCart(cid, pid) {
     try {
       let cartToUse;
