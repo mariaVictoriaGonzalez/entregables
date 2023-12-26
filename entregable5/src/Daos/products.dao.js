@@ -13,7 +13,7 @@ class ProductDao {
     async getProductById(_id) {
         try {
             const objectId = new mongoose.Types.ObjectId(_id);
-            return await productModel.findById(_id);
+            return await productModel.findById(objectId);
         } catch (error) {
             throw new Error(`Error while fetching product by ID: ${error.message}`);
         }
@@ -29,7 +29,7 @@ class ProductDao {
 
     async updateProduct(_id, product) {
         try {
-            const objectId = new mongoose.Types.ObjectId(_id);
+            const objectId = new mongoose.Types.ObjectId(objectId);
             return await productModel.findByIdAndUpdate(objectId, product);
         } catch (error) {
             throw new Error(`Error while updating product: ${error.message}`);
@@ -38,7 +38,7 @@ class ProductDao {
 
     async deleteProduct(_id) {
         try {
-            const objectId = new mongoose.Types.ObjectId(_id);
+            const objectId = new mongoose.Types.ObjectId(objectId);
             return await productModel.findByIdAndDelete(objectId);
         } catch (error) {
             throw new Error(`Error while deleting product: ${error.message}`);

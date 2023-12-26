@@ -112,11 +112,11 @@ router.put("/:id", async (request, response) => {
     }
 });
 
-router.post("/addToCart/:productId", async (request, response) => {
+router.post("/:cid/products/:pid", async (request, response) => {
     const productId  = request.body;
+    await cartsDao.createCartAndAddProduct(productId);
 
     try {
-        await cartsDao.createCartAndAddProduct(productId);
         const product = await productsDao.getProductById(productId);
 
         if (!product) {
