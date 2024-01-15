@@ -9,9 +9,13 @@ const schema = new mongoose.Schema({
         type: String,
         unique: true
     },
-    password: String
+    password: String,
+    role:{
+        type:String,
+        default:"user"
+    }
 })
 
 const userModel = mongoose.model(collection, schema)
 
-export default userModel;
+export  { userModel };

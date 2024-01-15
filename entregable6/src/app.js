@@ -50,8 +50,8 @@ app.get("/", (request, response) => {
 
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
-app.use("/api/session", sessionsRouter);
-app.use("/users", usersViewRouter);
+app.use("/api/sessions", sessionsRouter);
+app.use("/api/users", usersViewRouter);
 
 app.engine(
   "hbs",

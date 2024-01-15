@@ -1,5 +1,5 @@
 import { Router } from "express";
-import userModel from "../daos/models/user.model.js";
+import { userModel } from "../daos/models/user.model.js";
 
 const router = Router();
 
@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = await userModel.findOne({ email, password }); //Ya que el password no está hasheado, podemos buscarlo directamente
+  const user = await userModel.findOne({ email, password });
 
   if (!user)
     return res
@@ -49,6 +49,7 @@ router.post("/login", async (req, res) => {
     payload: req.session.user,
     message: "¡Primer logueo realizado! :)",
   });
+  
 });
 
 export default router;
