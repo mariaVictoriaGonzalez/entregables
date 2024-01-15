@@ -5,6 +5,7 @@ import realTimeProductsRouter from "./routes/realTimeProducts.router.js";
 import chatRouter from "./routes/chat.router.js";
 import handlebars from "express-handlebars";
 import sessionsRouter from "./routes/sessions.router.js";
+import usersViewRouter from "./routes/users.views.router.js";
 import __dirname from "./dirname.js";
 import { Server } from "socket.io";
 import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
@@ -26,12 +27,12 @@ app.use(
     store: MongoStore.create({
       mongoUrl: MONGODB_URI,
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-      ttl: 10 * 60,
+      ttl:60,
     }),
 
     secret: "coderS3cr3t",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
   })
 );
 
@@ -50,6 +51,7 @@ app.get("/", (request, response) => {
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/session", sessionsRouter);
+app.use("/users", usersViewRouter);
 
 app.engine(
   "hbs",
