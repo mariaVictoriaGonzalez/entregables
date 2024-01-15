@@ -1,6 +1,5 @@
 async function addToCart(cartId, productId) {
     try {
-
         // Agrega el producto al carrito utilizando el cartId
         const addToCartResponse = await fetch(`/api/carts/${cartId}/products/${productId}`, {
             method: 'POST',
@@ -66,3 +65,36 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+async function logout(buttonId) {
+    try {
+      // Puedes hacer algo con el ID del botón si es necesario
+      console.log(`Cerrando sesión desde el botón con ID: ${buttonId}`);
+  
+      const response = await fetch('/api/sessions/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        console.log('Usuario desconectado exitosamente');
+        window.location.href = '/api/users/login';
+      } else {
+        console.error('Error al cerrar sesión:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  }
+  
+  document.addEventListener("DOMContentLoaded", function () {
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+      logoutButton.addEventListener('click', function () {
+        logout('logoutButton'); // Pasar el ID del botón a la función logout
+      });
+    }
+  });
+  
