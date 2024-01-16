@@ -12,6 +12,7 @@ router.post("/register", async (req, res) => {
     const exist = await userModel.findOne({ email });
 
     if (exist) {
+      
       return res
         .status(400)
         .send({ status: "error", message: "Usuario ya existe!" });
