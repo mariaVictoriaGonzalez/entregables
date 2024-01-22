@@ -14,10 +14,9 @@ router.post(
     try {
       console.log("Registrando usuario:");
 
-      const result = await userModel.create(user);
       res.status(201).send({
         status: "success",
-        message: "Usuario creado con éxito con ID: " + result.id,
+        message: "Usuario creado con éxito con ID.",
       });
     } catch (error) {
       console.error("Error al registrar usuario:", error);

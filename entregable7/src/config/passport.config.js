@@ -1,14 +1,14 @@
 import passport from "passport";
 import passportLocal from "passport-local";
-import { userModel } from "../daos/models/user.model";
-import { createHash, isValidPassword } from "../utils";
+import { userModel } from "../daos/models/user.model.js";
+import { createHash, isValidPassword } from "../utils.js";
 
 const localStrategy = passportLocal.Strategy;
 
 const initializePassport = () => {
   passport.use(
     "register",
-    new localStrategy({ passReqToCallback: true, usernameField: "email" }),
+    new localStrategy({ passReqToCallback: true, usernameField: "email" },
     async (req, username, password, done) => {
       const { first_name, last_name, email } = req.body;
 
@@ -30,7 +30,7 @@ const initializePassport = () => {
         // Asignar el rol "admin" solo si las credenciales coinciden
         if (
           user.email === "adminCoder@coder.com" &&
-          user.password === "Cod3r123"
+          password === "Cod3r123"
         ) {
           user.role = "admin";
         } else {
@@ -44,14 +44,14 @@ const initializePassport = () => {
         return done("Error registrando al usuario" + error);
       }
     }
-  );
+  ));
 
   passport.use(
     "login",
     new localStrategy(
       { passReqToCallback: true, usernameField: "email" },
       async (req, username, password, done) => {
-        const { email, password } = req.body;
+        const { email } = req.body;
 
         try {
           const user = await userModel.findOne({ email: username });
