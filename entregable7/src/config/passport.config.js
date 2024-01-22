@@ -10,7 +10,7 @@ const initializePassport = () => {
     "register",
     new localStrategy({ passReqToCallback: true, usernameField: "email" }),
     async (req, username, password, done) => {
-      const { first_name, last_name, email, password } = req.body;
+      const { first_name, last_name, email } = req.body;
 
       try {
         const exist = await userModel.findOne({ email });
@@ -54,7 +54,7 @@ const initializePassport = () => {
         const { email, password } = req.body;
 
         try {
-          const user = await userModel.findOne({ email, password });
+          const user = await userModel.findOne({ email: username });
 
           if (!user) {
             console.warn("Usuario inexistente:" + username);
@@ -74,11 +74,17 @@ const initializePassport = () => {
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user._id)
+    done(null, user._id);
   });
 
-  passport.deserializeUser((user, done) => {
-    done(null, user._id)
+  passport.deserializeUser(async (id, done) => {
+    try {
+      let user = await userModel.findById(id);
+      done(null, user);
+    } catch (error) {
+      console.error("Error deserializando el usuario: " + error);
+    }
   });
-
 };
+
+export default initializePassport;
