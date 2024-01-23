@@ -12,6 +12,7 @@ const schema = new mongoose.Schema({
   password: String,
   role: {
     type: String,
+    default: "user",
   },
   loggedBy: String,
 });

@@ -79,10 +79,10 @@ router.get("/githubcallback", passport.authenticate('github', { failureRedirect:
   req.session.user = {
       name: `${user.first_name} ${user.last_name}`,
       email: user.email,
-      age: user.age
+      role: user.role
   };
   req.session.admin = true;
-  res.redirect("/products")
+  res.redirect("/api/products")
 })
 
 router.get("/fail-register", (req, res) => {
