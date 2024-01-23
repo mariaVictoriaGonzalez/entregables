@@ -13,6 +13,7 @@ const schema = new mongoose.Schema({
   role: {
     type: String,
   },
+  loggedBy: String,
 });
 
 const userModel = mongoose.model(collection, schema);

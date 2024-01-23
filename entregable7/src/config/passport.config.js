@@ -2,49 +2,52 @@ import passport from "passport";
 import passportLocal from "passport-local";
 import { userModel } from "../daos/models/user.model.js";
 import { createHash, isValidPassword } from "../utils.js";
+import GitHubStrategy from "passport-github2";
 
 const localStrategy = passportLocal.Strategy;
 
 const initializePassport = () => {
   passport.use(
     "register",
-    new localStrategy({ passReqToCallback: true, usernameField: "email" },
-    async (req, username, password, done) => {
-      const { first_name, last_name, email } = req.body;
+    new localStrategy(
+      { passReqToCallback: true, usernameField: "email" },
+      async (req, username, password, done) => {
+        const { first_name, last_name, email } = req.body;
 
-      try {
-        const exist = await userModel.findOne({ email });
+        try {
+          const exist = await userModel.findOne({ email });
 
-        if (exist) {
-          console.log("El usuario ya existe.");
-          done(null, false);
+          if (exist) {
+            console.log("El usuario ya existe.");
+            done(null, false);
+          }
+
+          let user = {
+            first_name,
+            last_name,
+            email,
+            password: createHash(password),
+          };
+
+          // Asignar el rol "admin" solo si las credenciales coinciden
+          if (
+            user.email === "adminCoder@coder.com" &&
+            password === "Cod3r123"
+          ) {
+            user.role = "admin";
+          } else {
+            user.role = "user"; // Asignar un rol predeterminado si no es un administrador
+          }
+
+          const result = await userModel.create(user);
+
+          return done(null, result);
+        } catch (error) {
+          return done("Error registrando al usuario" + error);
         }
-
-        let user = {
-          first_name,
-          last_name,
-          email,
-          password: createHash(password),
-        };
-
-        // Asignar el rol "admin" solo si las credenciales coinciden
-        if (
-          user.email === "adminCoder@coder.com" &&
-          password === "Cod3r123"
-        ) {
-          user.role = "admin";
-        } else {
-          user.role = "user"; // Asignar un rol predeterminado si no es un administrador
-        }
-
-        const result = await userModel.create(user);
-
-        return done(null, result);
-      } catch (error) {
-        return done("Error registrando al usuario" + error);
       }
-    }
-  ));
+    )
+  );
 
   passport.use(
     "login",
@@ -68,6 +71,45 @@ const initializePassport = () => {
           return done(null, user);
         } catch (error) {
           return done("Error de login" + error);
+        }
+      }
+    )
+  );
+
+  passport.use(
+    "github",
+    new GitHubStrategy(
+      {
+        clientID: "Iv1.1229150a8868fa77",
+        clientSecret: "9d32bd5287555b114b3923b6406a6bd2862cbc7a",
+        callbackUrl: "http://localhost:8080/api/sessions/githubcallback",
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        console.log("Profile obtenido del usuario de GitHub: ");
+        console.log(profile);
+        try {
+          const user = await userModel.findOne({ email: profile._json.email });
+          console.log("Usuario encontrado para login:");
+          console.log(user);
+          if (!user) {
+            console.warn(
+              "User doesn't exists with username: " + profile._json.email
+            );
+            let newUser = {
+              first_name: profile._json.name,
+              last_name: "",
+              age: 28,
+              email: profile._json.email,
+              password: "",
+              loggedBy: "GitHub",
+            };
+            const result = await userModel.create(newUser);
+            return done(null, result);
+          } else {
+            return done(null, user);
+          }
+        } catch (error) {
+          return done(error);
         }
       }
     )
