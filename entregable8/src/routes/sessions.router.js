@@ -1,5 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
+import { authorization, passportCall, generateJWToken } from "../utils.js"
 
 const router = Router();
 
@@ -29,21 +30,28 @@ router.post(
     failureRedirect: "api/sessions/fail-login",
   }),
   async (req, res) => {
-    console.log("Usuario encontrado para login.");
+    try {
+      const user = req.user;
+      console.log(user);
 
-    const user = req.user;
-    console.log(user);
+      const tokenUser = {
+        name: `${user.first_name} ${user.last_name}`,
+        email: user.email,
+        age: user.age,
+        role: user.role,
+      };
+      const access_token = generateJWToken(tokenUser);
+      console.log(access_token);
 
-    req.session.user = {
-      name: `${user.first_name} ${user.last_name}`,
-      email: user.email,
-    };
-
-    res.send({
-      status: "success",
-      payload: req.session.user,
-      message: "¡Primer logueo realizado! :)",
-    });
+      res.cookie("jwtCookieToken", access_token, {
+        maxAge: 60000,
+        httpOnly: true,
+      });
+      res.send({ message: "Login success!!" });
+    } catch (error) {
+      console.error("Error al procesar el inicio de sesión:", error);
+      res.status(500).send("Error interno del servidor");
+    }
   }
 );
 
@@ -71,10 +79,7 @@ router.post("/logout", (req, res) => {
 router.get(
   "/github",
   passport.authenticate("github", { scope: ["user:email"] }),
-  async (req, res) => {
-    {
-    }
-  }
+  async (req, res) => {}
 );
 
 router.get(
@@ -82,12 +87,20 @@ router.get(
   passport.authenticate("github", { failureRedirect: "/github/error" }),
   async (req, res) => {
     const user = req.user;
-    req.session.user = {
+
+    const tokenUser = {
       name: `${user.first_name} ${user.last_name}`,
       email: user.email,
+      age: user.age,
       role: user.role,
     };
-    req.session.admin = true;
+    const access_token = generateJWToken(tokenUser);
+    console.log(access_token);
+
+    res.cookie("jwtCookieToken", access_token, {
+      maxAge: 60000,
+      httpOnly: true,
+    });
     res.redirect("/api/products");
   }
 );
@@ -100,9 +113,9 @@ router.get("/fail-login", (req, res) => {
   res.status(401).send({ error: "Failed to process login!" });
 });
 
-sessionRouter.get(
+router.get(
   "/current",
-  passportError("jwt"),
+  passportCall("jwt"),
   authorization("user"),
   (req, res) => {
     res.send(req.user);

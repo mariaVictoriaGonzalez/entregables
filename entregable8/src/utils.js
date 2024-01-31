@@ -13,24 +13,35 @@ export const isValidPassword = (user, password) =>
 
 export const PRIVATE_KEY = "CoderhouseBackendCourseSecretKeyJWT";
 export const generateJWToken = (user) => {
-  return jwt.sign({ user }, PRIVATE_KEY, { expiresIn: "60s" });
+  return jwt.sign({ user }, PRIVATE_KEY, { expiresIn: "90s" });
 };
 
 export const authToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   console.log("Token present in header auth:");
   console.log(authHeader);
+
   if (!authHeader) {
     return res
       .status(401)
-      .send({ error: "Usuario no encontrado o token invalido." });
+      .send({ error: "Usuario no encontrado o token inválido." });
   }
+
   const token = authHeader.split(" ")[1];
   jwt.verify(token, PRIVATE_KEY, (error, credentials) => {
-    if (error)
-      return res.status(403).send({ error: "Token no valido, no autorizado!" });
+    if (error) {
+      if (error.name === "TokenExpiredError") {
+        return res
+          .status(401)
+          .send({
+            error: "Token expirado. Por favor, inicie sesión nuevamente.",
+          });
+      }
+      return res.status(403).send({ error: "Token no válido, no autorizado." });
+    }
+
     req.user = credentials.user;
-    console.log("Se extrae la informacion del Token:");
+    console.log("Se extrae la información del Token:");
     console.log(req.user);
     next();
   });
