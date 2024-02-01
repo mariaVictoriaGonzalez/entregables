@@ -14,8 +14,7 @@ const schema = new mongoose.Schema({
     type: String,
     default: "user",
   },
-  loggedBy: String,
-  cart: String
+  loggedBy: String
 });
 
 const userModel = mongoose.model(collection, schema);

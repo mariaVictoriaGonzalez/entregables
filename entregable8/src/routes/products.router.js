@@ -1,7 +1,7 @@
 import { Router } from "express";
 import productsDao from "../daos/products.dao.js";
 import usersDao from "../daos/users.dao.js";
-import { authToken } from "../utils.js";
+import { authToken, authorization, passportCall } from "../utils.js";
 
 const router = Router();
 
@@ -10,9 +10,14 @@ router.get("/", authToken, async (request, response) => {
     const { limit, page, query, sort } = request.query;
     const userEmail = request.user.email;
 
-    const productsToRender = await productsDao.getAllProducts( limit,page, query, sort);
-    console.log(productsToRender)
-    const userToRender = await usersDao.getUserByEmail(userEmail)
+    const productsToRender = await productsDao.getAllProducts(
+      limit,
+      page,
+      query,
+      sort
+    );
+    console.log(productsToRender);
+    const userToRender = await usersDao.getUserByEmail(userEmail);
 
     response.render("home", {
       title: "Productos",
