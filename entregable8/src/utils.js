@@ -2,7 +2,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import initializePassport from "./config/passport.config.js";
 import passport from "passport";
 
 const __filename = fileURLToPath(import.meta.url);
