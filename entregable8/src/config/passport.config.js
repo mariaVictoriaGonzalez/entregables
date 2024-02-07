@@ -8,7 +8,7 @@ import jwtStrategy from "passport-jwt";
 const localStrategy = passportLocal.Strategy;
 
 const JwtStrategy = jwtStrategy.Strategy;
-const ExtractJWT = jwtStrategy.ExtractJwt;
+const ExtractJWT = jwtStrategy.ExtractJwt
 
 const initializePassport = () => {
   passport.use(
@@ -151,6 +151,8 @@ const initializePassport = () => {
       console.error("Error deserializando el usuario: " + error);
     }
   });
+  return passport;
+
 };
 
 const cookieExtractor = (req) => {

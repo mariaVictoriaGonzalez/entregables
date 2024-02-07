@@ -3,6 +3,7 @@ import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import realTimeProductsRouter from "./routes/realTimeProducts.router.js";
 import chatRouter from "./routes/chat.router.js";
+import profileRouter from "./routes/profile.router.js";
 import handlebars from "express-handlebars";
 import sessionsRouter from "./routes/sessions.router.js";
 import usersViewRouter from "./routes/users.views.router.js";
@@ -63,6 +64,7 @@ app.use("/api/carts", cartsRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/users", usersViewRouter);
 app.use("/github", githubLoginViewRouter);
+app.use("/api/profile", profileRouter);
 
 app.engine(
   "hbs",
