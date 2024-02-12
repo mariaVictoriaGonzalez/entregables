@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authToken, passportCall } from "../utils.js";
-import usersDao from "../daos/users.dao.js";
+import { passportCall } from "../utils.js";
+import usersDao from "../services/db/users.dao.js";
 const router = Router();
 
 router.get("/", passportCall("jwt"), async (request, response) => {

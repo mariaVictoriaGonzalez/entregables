@@ -1,7 +1,7 @@
 import { Router } from "express";
-import productsDao from "../daos/products.dao.js";
-import usersDao from "../daos/users.dao.js";
-import { authToken, authorization, passportCall } from "../utils.js";
+import productsDao from "../services/db/products.dao.js";
+import usersDao from "../services/db/users.dao.js";
+import { authToken } from "../utils.js";
 
 const router = Router();
 

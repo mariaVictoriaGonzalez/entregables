@@ -1,4 +1,4 @@
-import chatDao from "../daos/chat.dao.js";
+import chatDao from "../services/db/chat.dao.js";
 import { Router } from "express";
 
 const router = Router();
