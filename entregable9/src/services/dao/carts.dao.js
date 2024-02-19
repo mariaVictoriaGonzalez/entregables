@@ -1,6 +1,6 @@
-import { cartModel } from "./models/cart.model.js";
+import { cartModel } from "../models/cart.model.js";
 
-class CartDao {
+export default class CartsService {
   async getAllCarts() {
     try {
       return await cartModel.find();
@@ -71,5 +71,3 @@ class CartDao {
     }
   }
     }
-
-export default new CartDao();

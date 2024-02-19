@@ -1,79 +1,44 @@
-import { Router } from 'express';
-import productsDao from '../services/db/products.dao.js';
+import { Router } from "express";
+import ProductsService from "../services/dao/products.dao.js";
+import { renderRealTimeProducts, addProductOnRealTime } from "../controllers/realTimeProducts.controller.js";
 
-
+const producsService = new ProductsService();
 const router = Router();
 
-router.get("/", (request, response) => {
-    response.render("realTimeProducts", {
-        title: "Agregar productos en tiempo real.",
-        fileCss: "../css/styles.css"
-    });
-});
+router.get("/", renderRealTimeProducts);
 
-router.post("/", async (request, response) => {
-    const {
-        title,
-        description,
-        price,
-        thumbnail,
-        code,
-        stock,
-        status,
-        category
-    } = request.body;
-    
-    const product = { title, description, price, thumbnail, code, stock, status, category };
-
-    try {
-        await productsDao.createProduct(product);
-        response.status(201).json({
-            data: {
-                message: "Producto creado",
-            }
-        });
-    } catch (e) {
-        response.status(500).json({
-            error: {
-                message: e.message,
-            }
-        });
-    }
-
-});
+router.post("/", addProductOnRealTime);
 
 export default (io) => {
-    io.on("connection", async socket => {
-        console.log("Cliente conectado");
+  io.on("connection", async (socket) => {
+    console.log("Cliente conectado");
 
-        socket.on("product_send", async (data) => {
-            try {
-                const product = {
-                    title: data.title,
-                    description: data.description,
-                    price: Number(data.price),
-                    thumbnail: data.thumbnail,
-                    code: data.code,
-                    stock: Number(data.stock),
-                    status: data.status,
-                    category: data.category
-                };
-                await productsDao.createProduct(product);
-                io.emit("products", await productsDao.getAllProducts());
-                console.log(product)
-                console.log(productsDao.getAllProducts())
-            } catch (error) {
-                console.log(error)
-            }
-        });
-        socket.emit("products", await productsDao.getAllProducts());
-
-        socket.on("delete_product", async (_id) => {
-            await productsDao.deleteProduct(_id);
-            io.emit("products", await productsDao.getAllProducts());
-        });
+    socket.on("product_send", async (data) => {
+      try {
+        const product = {
+          title: data.title,
+          description: data.description,
+          price: Number(data.price),
+          thumbnail: data.thumbnail,
+          code: data.code,
+          stock: Number(data.stock),
+          status: data.status,
+          category: data.category,
+        };
+        await producsService.createProduct(product);
+        io.emit("products", await producsService.getAllProducts());
+        console.log(product);
+        console.log(producsService.getAllProducts());
+      } catch (error) {
+        console.log(error);
+      }
     });
-    return router;
+    socket.emit("products", await producsService.getAllProducts());
+
+    socket.on("delete_product", async (_id) => {
+      await producsService.deleteProduct(_id);
+      io.emit("products", await producsService.getAllProducts());
+    });
+  });
+  return router;
 };
-
-

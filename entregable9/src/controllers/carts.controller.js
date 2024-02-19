@@ -1,6 +1,9 @@
 import CartsService from "../services/dao/carts.dao.js";
+import ProductsService from "../services/dao/products.dao.js";
 
 const cartService = new CartsService();
+const productsService = new ProductsService()
+
 
 export const getNewCart = async (req, res) => {
   try {
@@ -14,7 +17,7 @@ export const getNewCart = async (req, res) => {
 
 export const renderCart = async (req, res) => {
   try {
-    const cartsToRender = await cartsDao.getAllCarts();
+    const cartsToRender = await cartService.getAllCarts();
     console.log(cartsToRender);
 
     const cartIds = cartsToRender.map((cart) => cart._id);
@@ -29,7 +32,7 @@ export const renderCart = async (req, res) => {
 export const getCartById = async (req, res) => {
   try {
     const { cid } = req.params;
-    const cartWithProducts = await cartsDao.getProductsFromCart(cid);
+    const cartWithProducts = await cartService.getProductsFromCart(cid);
 
     res.json(cartWithProducts);
     console.log(cartWithProducts);
@@ -42,10 +45,10 @@ export const getCartById = async (req, res) => {
 export const deleteCartById = async (req, res) => {
   try {
     const { cid } = req.params;
-    const deletedCart = await cartsDao.getCartById(cid);
+    const deletedCart = await cartService.getCartById(cid);
     deletedCart.products = [];
 
-    let updatedCart = await cartsDao.updateCart(cid, deletedCart);
+    let updatedCart = await cartService.updateCart(cid, deletedCart);
     res.json(updatedCart);
     console.log(updatedCart);
   } catch (error) {
@@ -61,10 +64,10 @@ export const deleteProductFromCart = async (req, res) => {
     const quantity = req.body.quantity;
     const cartId = cid;
 
-    const cart = await cartsDao.getCartById(cartId);
+    const cart = await cartService.getCartById(cartId);
 
     if (cart) {
-      const product = await productsDao.getProductById(productId);
+      const product = await productsService.getProductById(productId);
 
       if (product) {
         const index = cart.products.findIndex((item) =>
@@ -77,7 +80,7 @@ export const deleteProductFromCart = async (req, res) => {
           cart.products.splice(index, 1);
         }
 
-        const response = await cartsDao.updateCart(cartId, cart);
+        const response = await cartService.updateCart(cartId, cart);
 
         res.status(200).json({ response: "OK", message: response });
       } else {
@@ -99,10 +102,10 @@ export const addProductToCart = async (req, res) => {
     const quantity = req.body.quantity;
     const cartId = cid;
 
-    const cart = await cartsDao.getCartById(cartId);
+    const cart = await cartService.getCartById(cartId);
 
     if (cart) {
-      const product = await productsDao.getProductById(productId);
+      const product = await productsService.getProductById(productId);
 
       if (product) {
         const index = cart.products.findIndex((item) =>
@@ -115,7 +118,7 @@ export const addProductToCart = async (req, res) => {
           cart.products.push({ product: productId, quantity: quantity });
         }
 
-        const response = await cartsDao.updateCart(cartId, cart);
+        const response = await cartService.updateCart(cartId, cart);
 
         res.status(200).json({ response: "OK", message: response });
       } else {
@@ -133,7 +136,7 @@ export const addProductToCart = async (req, res) => {
 export const modifyProductQuantityToCart = async (req, res) => {
   try {
     const cid = req.params.cid;
-    const cart = await cartsDao.getCartById(cid);
+    const cart = await cartService.getCartById(cid);
     const products = req.body;
 
     products.forEach((e) => {
@@ -154,8 +157,8 @@ export const modifyProductOnCart = async (req, res) => {
   try {
     const cid = req.params.cid;
     const pid = req.params.pid;
-    const cart = await cartsDao.getCartById(cid);
-    const product = await productsDao.getProductById(pid);
+    const cart = await cartService.getCartById(cid);
+    const product = await productsService.getProductById(pid);
 
     const index = cart.products.findIndex((item) => item.product.equals(pid));
 
@@ -165,7 +168,7 @@ export const modifyProductOnCart = async (req, res) => {
       cart.products.push({ product: pid, quantity: req.body.quantity });
     }
 
-    const updatedCart = await cartsDao.updateCart(cid, cart);
+    const updatedCart = await cartService.updateCart(cid, cart);
 
     res.status(200).json({ response: "OK", cart: updatedCart });
   } catch (error) {

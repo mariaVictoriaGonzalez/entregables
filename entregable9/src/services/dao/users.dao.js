@@ -1,6 +1,6 @@
-import { userModel } from "./models/user.model.js";
+import { userModel } from "../models/user.model.js";
 
-class UserDao {
+export default class UsersService {
   async getUserByEmail(email) {
     try {
       return await userModel.findOne({ email });
@@ -9,5 +9,3 @@ class UserDao {
     }
   }
 }
-
-export default new UserDao();

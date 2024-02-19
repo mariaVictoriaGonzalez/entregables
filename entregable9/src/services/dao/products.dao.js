@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { productModel } from "./models/products.model.js";
+import { productModel } from "../models/products.model.js";
 
-class ProductDao {
+export default class ProductsService {
   async getAllProducts(limit = 10, page = 1, query, sort) {
     try {
       limit = parseInt(limit) || 10;
@@ -65,4 +65,3 @@ class ProductDao {
     }
   }
 }
-export default new ProductDao();
