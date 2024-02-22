@@ -26,10 +26,16 @@ form.addEventListener("submit", (e) => {
 socket.on("products", (data) => {
     productsContainer.innerHTML = "";
 
-    if (Array.isArray(data)) {
-        data.forEach((product) => {
+    if (data && data.docs) {
+        data.docs.forEach((product) => {
             addProductToUI(product);
         });
+
+        // Aquí puedes agregar lógica para manejar la paginación si es necesario
+        if (data.pageInfo) {
+            console.log("Pagina actual:", data.pageInfo.currentPage);
+            console.log("Total de páginas:", data.pageInfo.totalPages);
+        }
     } else {
         console.error("Invalid data format:", data);
     }
@@ -59,5 +65,3 @@ productsContainer.addEventListener("click", (event) => {
         socket.emit("delete_product", productId);
     }
 });
-
-

@@ -2,7 +2,7 @@ import express from "express";
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import realTimeProductsRouter from "./routes/realTimeProducts.router.js";
-import chatRouter from "./routes/chat.router.js";
+import realTimeProductsSocket from "./sockets/realTimeProducts.socket.js";
 import profileRouter from "./routes/profile.router.js";
 import handlebars from "express-handlebars";
 import sessionsRouter from "./routes/sessions.router.js";
@@ -79,6 +79,5 @@ const httpServer = app.listen(config.port, () =>
 );
 
 const io = new Server(httpServer);
-
-app.use("/api/realtimeproducts", realTimeProductsRouter(io));
-app.use("/api/chat", chatRouter(io));
+realTimeProductsSocket(io)
+app.use("/api/realtimeproducts", realTimeProductsRouter);
