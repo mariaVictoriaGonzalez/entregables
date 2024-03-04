@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
 import config from "./config/config.js";
+import { faker } from "@faker-js/faker";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,7 +13,6 @@ export const createHash = (password) =>
   bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 export const isValidPassword = (user, password) =>
   bcrypt.compareSync(password, user.password);
-
 
 export const generateJWToken = (user) => {
   return jwt.sign({ user }, config.privateKey, { expiresIn: "190s" });
@@ -53,19 +53,21 @@ export const authToken = (req, res, next) => {
 
 export const passportCall = (strategy) => {
   return async (req, res, next) => {
-      console.log("Entrando a llamar strategy: ");
-      console.log(strategy);
-      passport.authenticate(strategy, function (err, user, info) {
-          if (err) return next(err);
-          if (!user) {
-              return res.status(401).send({error: info.messages?info.messages:info.toString()});
-          }
-          console.log("Usuario obtenido del strategy: ");
-          console.log(user);
-          req.user = user;
-          next();
-      })(req, res, next);
-  }
+    console.log("Entrando a llamar strategy: ");
+    console.log(strategy);
+    passport.authenticate(strategy, function (err, user, info) {
+      if (err) return next(err);
+      if (!user) {
+        return res
+          .status(401)
+          .send({ error: info.messages ? info.messages : info.toString() });
+      }
+      console.log("Usuario obtenido del strategy: ");
+      console.log(user);
+      req.user = user;
+      next();
+    })(req, res, next);
+  };
 };
 
 export const authorization = (role) => {
@@ -95,3 +97,25 @@ export const authorization = (role) => {
 };
 
 export default __dirname;
+
+///faker
+
+faker.location = "es";
+
+export const generateProduct = () => {
+  let numbberOfProducts = 100;
+  let products = [];
+  for (let i = 0; i < numbberOfProducts; i++) {
+    products.push(generateProduct());
+  }
+  return {
+    title: faker.commerce.productName(),
+    description: faker.commerce.productDescription(),
+    price: faker.commerce.price({min:10, max:500, symbol:"$"}),
+    thumbnail: faker.commerce.productMaterial(),
+    code: faker.commerce.isbn(),
+    stock: faker.finance.amount({ min: 0, max: 50, dec: 0 }),
+    status: true,
+    category: faker.commerce.department(),
+  };
+};
