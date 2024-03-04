@@ -103,16 +103,21 @@ export default __dirname;
 faker.location = "es";
 
 export const generateProduct = () => {
-  let numbberOfProducts = 100;
+  let numberOfProducts = 100;
   let products = [];
-  for (let i = 0; i < numbberOfProducts; i++) {
-    products.push(generateProduct());
+  for (let i = 0; i < numberOfProducts; i++) {
+    products.push(generateSingleProduct());
   }
+  return products;
+};
+
+const generateSingleProduct = () => {
   return {
+    _id: faker.database.mongodbObjectId(),
     title: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
     price: faker.commerce.price({min:10, max:500, symbol:"$"}),
-    thumbnail: faker.commerce.productMaterial(),
+    thumbnail: faker.image.url(),
     code: faker.commerce.isbn(),
     stock: faker.finance.amount({ min: 0, max: 50, dec: 0 }),
     status: true,
