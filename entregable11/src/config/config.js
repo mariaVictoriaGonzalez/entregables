@@ -16,8 +16,8 @@ const environment = program.opts().mode;
 dotenv.config({
   path:
     environment === "production"
-      ? "./src/config/.env.production"
-      : "./src/config/.env.development",
+      ? "./src/.env.production"
+      : "./src/.env.development",
 });
 
 export default {
