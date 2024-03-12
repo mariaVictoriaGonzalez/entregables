@@ -1,4 +1,4 @@
-import winston, { transport } from "winston";
+import winston, { transports } from "winston";
 import config from "./config.js";
 
 const customLevelsOptions = {
@@ -6,16 +6,16 @@ const customLevelsOptions = {
     fatal: 0,
     error: 1,
     warning: 2,
-    http: 3,
-    info: 4,
+    info: 3,
+    http: 4,
     debug: 5,
   },
   colors: {
     fatal: "red",
     error: "orange",
     warning: "yellow",
-    http: "red",
     info: "blue",
+    http: "red",
     debug: "white",
   },
 };
@@ -25,16 +25,16 @@ const customLevelsOptions = {
 const prodLogger = winston.createLogger({
   levels: customLevelsOptions.levels,
   transports: [
-    new winston.transport.Console({
+    new winston.transports.Console({
       level: "info",
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.simple()
       ),
     }),
-    new winston.transport.File({
+    new winston.transports.File({
       filename: "./errors.log",
-      level: "warning",
+      level: "error",
       format: winston.format.simple(),
     }),
   ],
@@ -45,8 +45,8 @@ const prodLogger = winston.createLogger({
 const devLogger = winston.createLogger({
   level: customLevelsOptions.levels,
   transports: [
-    new winston.transport.Console({ level: "http" }),
-    new winston.transport.File({ filename: "./errors.log", level: "warn" }),
+    new winston.transports.Console({ level: "debug" }),
+    new winston.transports.File({ filename: "./errors.log", level: "error" }),
   ],
 });
 
