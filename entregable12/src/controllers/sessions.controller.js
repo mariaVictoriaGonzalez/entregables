@@ -80,7 +80,7 @@ export const githubLogin = async (req, res) => {
   res.redirect("/api/products");
 };
 
-export const recuperarPass = async (req, res) => {
+export const cambiararPass = async (req, res) => {
   try {
     // Busca el correo electrónico en la base de datos
     const usuario = await usersService.getUserByEmail({
@@ -123,7 +123,7 @@ const sendRecoveryMail = async (req, res, email) => {
       rejectUnauthorized: false,
     },
   });
-  
+
   transporter.verify(function (error, success) {
     if (error) {
       console.log(error);
@@ -136,7 +136,7 @@ const sendRecoveryMail = async (req, res, email) => {
     from: "Coder ecommerce - " + config.gmailAccount,
     to: email, // Utiliza el correo electrónico pasado como argumento
     subject: "Recuperar tu contraseña",
-    html: `<div><h1>Haz clic en el siguiente enlace para recuperar tu contraseña:</h1><br><a href="https://tu-sitio.com/recuperar-contraseña">Recuperar contraseña</a></div>`,
+    html: `<div><h1>Haz clic en el siguiente enlace para cambiar tu contraseña:</h1><br><a href="/api/sessions/modificarpass">Cambiar contraseña</a></div>`,
     attachments: [],
   };
 
@@ -147,3 +147,34 @@ const sendRecoveryMail = async (req, res, email) => {
     console.error(error);
   }
 };
+
+export const renderModificarPass = async (req, res) => {
+  try {
+    res.render("cambiarPass", {
+      title: "Cambio de contraseña",
+    });
+
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error interno del servidor");
+  }
+};
+
+export const modificarPass = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const newPassword = req.body.password; // Suponiendo que el campo de la nueva contraseña se llama "password" en el formulario
+
+    // Modificar la contraseña del usuario
+    const usuario = await usersService.modifyUser(email, newPassword);
+
+    // Renderizar la vista con un mensaje de éxito
+    res.render("cambiarPass", {
+      title: "Cambio de contraseña",
+      message: "Se ha cambiado la contraseña con éxito.",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error interno del servidor");
+  }
+}
