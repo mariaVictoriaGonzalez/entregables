@@ -11,10 +11,16 @@ const schema = new mongoose.Schema({
   },
   password: String,
   role: {
-    type: String,
-    default: "user",
+    type: {
+      type: String,
+      default: "user",
+    },
+    premium: {
+      type: Boolean,
+      default: false,
+    },
   },
-  loggedBy: String
+  loggedBy: String,
 });
 
 const userModel = mongoose.model(collection, schema);

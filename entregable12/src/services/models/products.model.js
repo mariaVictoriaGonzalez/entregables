@@ -15,6 +15,7 @@ try {
     stock: { type: Number, required: true },
     status: { type: Boolean, default: true },
     category: { type: String, required: true, index: true },
+    owner: { type: String, required: true, default: "admin" },
   });
 
   productSchema.plugin(mongoosePaginate);
