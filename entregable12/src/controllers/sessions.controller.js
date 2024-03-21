@@ -1,4 +1,5 @@
-import { authorization, passportCall, generateJWToken } from "../utils.js";
+import { usersService } from "../services/service.js";
+import { generateJWToken } from "../utils.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -80,5 +81,69 @@ export const githubLogin = async (req, res) => {
 };
 
 export const recuperarPass = async (req, res) => {
+  try {
+    // Busca el correo electrónico en la base de datos
+    const usuario = await usersService.getUserByEmail({
+      email: req.body.email,
+    });
+
+    if (!usuario) {
+      // Si no se encuentra el usuario, renderiza un mensaje indicando que el correo no fue encontrado
+      return res.render("recoveryMessage", {
+        title: "Recupero de contraseña",
+        message:
+          "El correo electrónico no fue encontrado en nuestra base de datos.",
+      });
+    }
+
+    // Llama a la función sendRecoveryMail y pasa el correo electrónico del usuario
+    await sendRecoveryMail(req, res, usuario.email);
+
+    // Renderiza un mensaje indicando que se ha enviado un correo electrónico de recuperación
+    res.render("recoveryMessage", {
+      title: "Recupero de contraseña",
+      message:
+        "Se ha enviado un correo electrónico con instrucciones para recuperar tu contraseña.",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+const sendRecoveryMail = async (req, res, email) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    port: 587,
+    auth: {
+      user: config.gmailAccount,
+      pass: config.gmailAppPassword,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
   
-}
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Server is ready to send recovery email.");
+    }
+  });
+
+  const mailOptions = {
+    from: "Coder ecommerce - " + config.gmailAccount,
+    to: email, // Utiliza el correo electrónico pasado como argumento
+    subject: "Recuperar tu contraseña",
+    html: `<div><h1>Haz clic en el siguiente enlace para recuperar tu contraseña:</h1><br><a href="https://tu-sitio.com/recuperar-contraseña">Recuperar contraseña</a></div>`,
+    attachments: [],
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Message sent: %s", info.messageId);
+  } catch (error) {
+    console.error(error);
+  }
+};

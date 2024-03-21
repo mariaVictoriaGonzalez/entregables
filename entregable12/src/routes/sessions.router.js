@@ -1,7 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import { authorization, passportCall, generateJWToken } from "../utils.js";
-import { githubLogin, loginUser, logoutUser, registerUser } from "../controllers/sessions.controller.js"
+import { githubLogin, loginUser, logoutUser, recuperarPass, registerUser } from "../controllers/sessions.controller.js"
 
 const router = Router();
 
@@ -52,6 +52,6 @@ router.get(
   }
 );
 
-router.get("/recuperarpass")
+router.get("/recuperarpass", recuperarPass)
 
 export default router;
