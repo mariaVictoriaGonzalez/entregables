@@ -57,7 +57,6 @@ app.use(cookieParser(config.privateKey));
 
 initializePassport();
 app.use(passport.initialize());
-//app.use(passport.session());
 
 app.use(addLogger);
 
@@ -65,10 +64,7 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/users", usersViewRouter);
-app.use("/github", githubLoginViewRouter);
-app.use("/api/profile", profileRouter);
 app.use("/api/mockingproducts", mockingProductsRouter);
-app.use("api/loggertest", loggerTestRouter);
 
 app.get("/api/logger", (req, res) => {
   req.logger.warning("Prueba de log level warning --> en Endpoint");

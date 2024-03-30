@@ -1,7 +1,14 @@
 import { Router } from "express";
 import passport from "passport";
 import { authorization, passportCall, generateJWToken } from "../utils.js";
-import { githubLogin, loginUser, logoutUser, cambiararPass, registerUser } from "../controllers/sessions.controller.js"
+import {
+  githubLogin,
+  loginUser,
+  logoutUser,
+  cambiararPass,
+  registerUser,
+  renderProfile,
+} from "../controllers/sessions.controller.js";
 
 const router = Router();
 
@@ -52,10 +59,20 @@ router.get(
   }
 );
 
-router.get("/cambiarpass", cambiararPass)
+router.get("/cambiarpass", cambiararPass);
 
-router.get("/modificarpass", renderModificarPass)
+router.get("/modificarpass", renderModificarPass);
 
-router.post("/modificarpass", modificarPass)
+router.post("/modificarpass", modificarPass);
+
+router.get("/profile", passportCall("jwt"), renderProfile);
+
+router.get("/github/login", (req, res) => {
+  res.render("githubLogin");
+});
+
+router.get("/github/error", (req, res) => {
+  res.render("error", { error: "No se pudo autenticar usando GitHub!" });
+});
 
 export default router;

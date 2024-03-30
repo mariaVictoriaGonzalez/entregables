@@ -13,11 +13,7 @@ const schema = new mongoose.Schema({
   role: {
     type: {
       type: String,
-      default: "user",
-    },
-    premium: {
-      type: Boolean,
-      default: false,
+      enum: ["user", "admin", "premium"],
     },
   },
   loggedBy: String,
