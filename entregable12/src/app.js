@@ -5,9 +5,6 @@ import realTimeProductsRouter from "./routes/realTimeProducts.router.js";
 import realTimeProductsSocket from "./sockets/realTimeProducts.socket.js";
 import chatRouter from "./routes/chat.router.js";
 import chatSocket from "./sockets/chat.socket.js";
-import profileRouter from "./routes/profile.router.js";
-import mockingProductsRouter from "./routes/mockingProducts.router.js";
-import loggerTestRouter from "./routes/logger.test.route.js";
 import handlebars from "express-handlebars";
 import sessionsRouter from "./routes/sessions.router.js";
 import usersViewRouter from "./routes/users.views.router.js";
@@ -20,7 +17,6 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
-import githubLoginViewRouter from "./routes/githubLogin.router.js";
 import cookieParser from "cookie-parser";
 import config from "./config/config.js";
 import { addLogger } from "./config/loggerCustom.js";
@@ -64,7 +60,6 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/users", usersViewRouter);
-app.use("/api/mockingproducts", mockingProductsRouter);
 
 app.get("/api/logger", (req, res) => {
   req.logger.warning("Prueba de log level warning --> en Endpoint");

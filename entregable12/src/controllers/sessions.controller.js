@@ -180,9 +180,7 @@ export const modificarPass = async (req, res) => {
 }
 
 import UserDTO from "../services/dao/DTOs/user.dto.js";
-import UserService from "../services/dao/mongoDb/users.dao.js";
 
-const usersService = new UserService();
 
 export const renderProfile = async (request, response) => {
   try {

@@ -8,6 +8,8 @@ import {
   cambiararPass,
   registerUser,
   renderProfile,
+  renderModificarPass,
+  modificarPass,
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
