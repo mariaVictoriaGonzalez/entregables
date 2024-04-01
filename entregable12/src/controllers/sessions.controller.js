@@ -181,21 +181,19 @@ export const modificarPass = async (req, res) => {
 
 import UserDTO from "../services/dao/DTOs/user.dto.js";
 
-
-export const renderProfile = async (request, response) => {
+export const renderProfile = async (req, res) => {
   try {
-    if (!request.isAuthenticated()) {
-      return response.status(401).send("Unauthorized: Usuario no autenticado");
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Unauthorized: Usuario no autenticado");
     }
 
-    console.log(request.user.email)
-    const email = request.user.email;
-    const userFromDatabase = await usersService.getUserByEmail(email);
-    const userToRender = new UserDTO(userFromDatabase);
+    const {name, role, email} = req.user
 
-    response.render("profile", {
+    res.render("profile", {
       title: "Perfil",
-      userToRender,
+      name,
+      role,
+      email      
     });
   } catch (error) {
     console.error("Error:", error);

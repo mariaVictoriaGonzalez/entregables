@@ -8,6 +8,8 @@ export async function getAllPRoducts(request, response) {
     
     const { limit, page, query, sort } = request.query;
 
+    const { name, _id} = request.user;
+
     const productsToRender = await productsService.getAllProducts(
       limit,
       page,
@@ -15,9 +17,13 @@ export async function getAllPRoducts(request, response) {
       sort
     );
 
+    console.log(request.user)
+
     response.render("home", {
       title: "Productos",
       productsToRender,
+      name: name,
+      uid: _id,
       fileCss: "../css/styles.css",
     });
   } catch (error) {

@@ -10,4 +10,9 @@ router.get("/register", (req, res) => {
   res.render("register");
 });
 
+router.get("/premium/:uid", (req, res) => {
+  res.render("isItPremium")
+})
+
+
 export default router;
