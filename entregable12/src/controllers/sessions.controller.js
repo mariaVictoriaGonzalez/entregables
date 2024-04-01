@@ -163,7 +163,7 @@ export const renderModificarPass = async (req, res) => {
 export const modificarPass = async (req, res) => {
   try {
     const email = req.body.email;
-    const newPassword = req.body.password; // Suponiendo que el campo de la nueva contraseña se llama "password" en el formulario
+    const newPassword = req.body.password; 
 
     // Modificar la contraseña del usuario
     const usuario = await usersService.modifyUser(email, newPassword);
@@ -178,8 +178,6 @@ export const modificarPass = async (req, res) => {
     res.status(500).send("Error interno del servidor");
   }
 }
-
-import UserDTO from "../services/dao/DTOs/user.dto.js";
 
 export const renderProfile = async (req, res) => {
   try {
@@ -198,5 +196,27 @@ export const renderProfile = async (req, res) => {
   } catch (error) {
     console.error("Error:", error);
     response.status(500).send("Internal Server Error");
+  }
+};
+
+
+export const changeToPremium = async (req, res) => {
+  try {
+    const { email } = req.user;
+
+    const user = await usersService.getUserByEmail(email);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.role = 'premium';
+
+    await usersService.modifyUser(role);
+
+    return res.status(200).json({ message: 'User role updated to premium' });
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

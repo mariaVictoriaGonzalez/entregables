@@ -69,6 +69,8 @@ router.post("/modificarpass", modificarPass);
 
 router.get("/profile", passportCall("jwt"), renderProfile);
 
+router.put("/changetopremium", )
+
 router.get("/github/login", (req, res) => {
   res.render("githubLogin");
 });
