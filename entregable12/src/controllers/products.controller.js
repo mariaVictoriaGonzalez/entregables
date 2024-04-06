@@ -1,14 +1,11 @@
 import { productsService, usersService } from "../services/service.js";
 import { generateProduct } from "../utils.js";
 
-
 export async function getAllPRoducts(request, response) {
-
   try {
-    
     const { limit, page, query, sort } = request.query;
 
-    const { name, _id} = request.user;
+    const { name, _id } = request.user;
 
     const productsToRender = await productsService.getAllProducts(
       limit,
@@ -17,7 +14,7 @@ export async function getAllPRoducts(request, response) {
       sort
     );
 
-    console.log(request.user)
+    console.log(request.user);
 
     response.render("home", {
       title: "Productos",
@@ -30,7 +27,7 @@ export async function getAllPRoducts(request, response) {
     console.error("Error:", error);
     response.status(500).send("Internal Server Error");
   }
-};
+}
 
 export const getProductById = async (request, response) => {
   const { id } = request.params;
@@ -61,11 +58,23 @@ export const createProduct = async (request, response) => {
     status,
     category,
   } = request.body;
-  const product =
-    (title, description, price, thumbnail, code, stock, status, category);
+
+  const user = request.user;
+
+  const productData = {
+    title,
+    description,
+    price,
+    thumbnail,
+    code,
+    stock,
+    status,
+    category,
+    owner: user.role === "premium" ? user.email : "admin",
+  };
 
   try {
-    await productsService.createProduct(product);
+    const product = await productsService.createProduct(productData);
     response.json({
       message: "Producto creado.",
       product,

@@ -8,11 +8,11 @@ router.get("/", passportCall("jwt"), authorization("user"), getAllPRoducts);
 
 router.get("/:id", getProductById);
 
-router.post("/", createProduct);
+router.post("/", createProduct, passportCall("jwt"), authorization(["admin", "premium"]));
 
 router.delete("/:id", deleteProduct);
 
-router.put("/:id", modifyProduct);
+router.put("/:id", modifyProduct, passportCall("jwt"), authorization(["admin", "premium"]));
 
 router.get("/getmockproducts", getMockProducts);
 
