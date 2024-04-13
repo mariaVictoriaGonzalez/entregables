@@ -1,5 +1,6 @@
 import { usersService } from "../services/service.js";
 import { generateJWToken } from "../utils.js";
+import nodemailer from "nodemailer";
 
 export const registerUser = async (req, res) => {
   try {
@@ -45,19 +46,13 @@ export const logoutUser = (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.error("Error al destruir la sesión:", err);
-        res
-          .status(500)
-          .json({ status: "error", message: "Error al cerrar sesión" });
+        res.status(500).json({ status: "error", message: "Error al cerrar sesión" });
       } else {
-        res
-          .status(200)
-          .json({ status: "success", message: "Sesión cerrada exitosamente" });
+        res.status(200).json({ status: "success", message: "Sesión cerrada exitosamente" });
       }
     });
   } else {
-    res
-      .status(400)
-      .json({ status: "error", message: "No hay sesión activa para cerrar" });
+    res.status(400).json({ status: "error", message: "No hay sesión activa para cerrar" });
   }
 };
 
@@ -83,27 +78,23 @@ export const githubLogin = async (req, res) => {
 export const cambiararPass = async (req, res) => {
   try {
     // Busca el correo electrónico en la base de datos
-    const usuario = await usersService.getUserByEmail({
-      email: req.body.email,
-    });
+    const usuario = await usersService.getUserByEmail(req.body.email);
 
     if (!usuario) {
       // Si no se encuentra el usuario, renderiza un mensaje indicando que el correo no fue encontrado
       return res.render("recoveryMessage", {
         title: "Recupero de contraseña",
-        message:
-          "El correo electrónico no fue encontrado en nuestra base de datos.",
+        message: "El correo electrónico no fue encontrado en nuestra base de datos.",
       });
     }
 
     // Llama a la función sendRecoveryMail y pasa el correo electrónico del usuario
-    await sendRecoveryMail(req, res, usuario.email);
+    await sendRecoveryMail(req.body.email);
 
     // Renderiza un mensaje indicando que se ha enviado un correo electrónico de recuperación
     res.render("recoveryMessage", {
       title: "Recupero de contraseña",
-      message:
-        "Se ha enviado un correo electrónico con instrucciones para recuperar tu contraseña.",
+      message: "Se ha enviado un correo electrónico con instrucciones para recuperar tu contraseña.",
     });
   } catch (error) {
     console.error("Error:", error);
@@ -111,7 +102,7 @@ export const cambiararPass = async (req, res) => {
   }
 };
 
-const sendRecoveryMail = async (req, res, email) => {
+const sendRecoveryMail = async (email) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     port: 587,
@@ -194,7 +185,7 @@ export const renderProfile = async (req, res) => {
     });
   } catch (error) {
     console.error("Error:", error);
-    response.status(500).send("Internal Server Error");
+    res.status(500).send("Internal Server Error");
   }
 };
 

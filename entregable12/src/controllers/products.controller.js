@@ -86,25 +86,25 @@ export const createProduct = async (request, response) => {
   }
 };
 
-export const deleteProduct = async (request, response) => {
-  const { id } = request.params;
-
+export const deleteProduct = async (req, res) => {
   try {
-    await productsService.deleteProduct(id);
-    response.json({
-      message: `Producto con ID ${id} eliminado.`,
-    });
-  } catch (error) {
-    if (error.code === "ECONNRESET") {
-      console.error("Error de conexión:", error);
-      return response.status(500).json({
-        error: "Error de conexión al intentar eliminar el producto.",
-      });
-    } else {
-      response.status(500).json({
-        error: error.message,
-      });
+    const productId = req.params.productId;
+    const product = await productsService.getProductById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: "Producto no encontrado" });
     }
+
+    // Verificar si el usuario tiene permisos para eliminar el producto
+    if (req.user.role === "admin" || (req.user.role === "premium" && product.owner === req.user._id)) {
+      await productsService.deleteProduct(productId);
+      return res.json({ message: "Producto eliminado exitosamente" });
+    } else {
+      return res.status(403).json({ error: "No tienes permiso para eliminar este producto" });
+    }
+  } catch (error) {
+    console.error("Error al eliminar el producto:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };
 

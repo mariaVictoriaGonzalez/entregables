@@ -10,7 +10,7 @@ router.get("/:id", getProductById);
 
 router.post("/", createProduct, passportCall("jwt"), authorization(["admin", "premium"]));
 
-router.delete("/:id", deleteProduct);
+router.delete("/:id", deleteProduct, passportCall("jwt"), authorization(["admin", "premium"]));
 
 router.put("/:id", modifyProduct, passportCall("jwt"), authorization(["admin", "premium"]));
 

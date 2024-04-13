@@ -70,11 +70,11 @@ export const passportCall = (strategy) => {
   };
 };
 
-export const authorization = (role) => {
+export const authorization = (roles) => {
   return async (req, res, next) => {
     try {
       console.log("User role:", req.user?.role);
-      console.log("Required role:", role);
+      console.log("Required roles:", roles);
 
       if (!req.user) {
         return res
@@ -82,7 +82,7 @@ export const authorization = (role) => {
           .json({ error: "Unauthorized: Usuario no encontrado en JWT" });
       }
 
-      if (req.user.role !== role) {
+      if (!roles.includes(req.user.role)) {
         return res.status(403).json({
           error: "Forbidden: El usuario no tiene permisos con este rol.",
         });
@@ -116,7 +116,7 @@ const generateSingleProduct = () => {
     _id: faker.database.mongodbObjectId(),
     title: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
-    price: faker.commerce.price({min:10, max:500, symbol:"$"}),
+    price: faker.commerce.price({ min: 10, max: 500, symbol: "$" }),
     thumbnail: faker.image.url(),
     code: faker.commerce.isbn(),
     stock: faker.finance.amount({ min: 0, max: 50, dec: 0 }),
