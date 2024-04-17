@@ -117,7 +117,7 @@ const generateSingleProduct = () => {
     _id: faker.database.mongodbObjectId(),
     title: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
-    price: faker.commerce.price({min:10, max:500, symbol:"$"}),
+    price: faker.commerce.price({ min: 10, max: 500, symbol: "$" }),
     thumbnail: faker.image.url(),
     code: faker.commerce.isbn(),
     stock: faker.finance.amount({ min: 0, max: 50, dec: 0 }),
@@ -126,8 +126,19 @@ const generateSingleProduct = () => {
   };
 };
 
-const storage  = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, `${__dirname}/files/img`)
-  }
-})
+    let destinationFolder = req.body.folder || "other";
+    cb(null, `${__dirname}/files/img/${destinationFolder}`);
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+export const uploader = multer({
+  storage,
+  onError: function (err, next) {
+    console.log(err), next();
+  },
+});

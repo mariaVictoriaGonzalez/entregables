@@ -218,3 +218,57 @@ export const changeToPremium = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const uploadFiles = async (req, res) => {
+  const { uid } = req.params;
+  const { folder } = req.params;
+  const uploadedFiles = req.files;
+  const user = req.user;
+
+  if (!req.files) {
+    return res
+      .status(400)
+      .send({ status: "error", mensaje: "No se adjunto archivo." });
+  }
+
+  if (folder === "profile") {
+    uploadedFiles.forEach((file) => {
+      const imgPath = file.path;
+      const imgName = file.originalname;
+
+      usersService.updateUserFiles(uid, imgName, imgPath);
+    });
+    req.logger.info("Imagen subida a profile");
+  } else if (folder === "products") {
+    uploadedFiles.forEach((file) => {
+      const imgPath = file.path;
+      const imgName = file.originalname;
+
+      usersService.updateUserFiles(uid, imgName, imgPath);
+    });
+    req.logger.info("Imágenes subida a products");
+  } else if (folder === "documents" && uploadedFiles.length === 3) {
+    uploadedFiles.forEach((file) => {
+      const imgPath = file.path;
+      const imgName = file.originalname;
+
+      usersService.updateUserFiles(uid, imgName, imgPath);
+    });
+  
+  usersService.updateUserStatus(uid);
+
+    req.logger.info("Imágenes subida a documents");
+  } else {
+    req.logger.info("Destino desconocido");
+  }
+
+  const access_token = generateJWToken(user);
+  res.cookie("jwtCookieToken", access_token, {
+    maxAge: 600000,
+    httpOnly: true,
+  });
+  res.send({
+    status: "success",
+    message: "imagenes subidas con éxito"
+  });
+};

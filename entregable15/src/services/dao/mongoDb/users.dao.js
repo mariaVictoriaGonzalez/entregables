@@ -27,4 +27,48 @@ export default class UsersServiceDao {
       throw new Error(`Error while modifying user: ${error.message}`);
     }
   }
+
+  async updateUserFiles(_id, imgName, imgPath) {
+    try {
+      if (mongoose.Types.ObjectId.isValid(_id)) {
+        const userExists = await userModel.findById({ _id });
+
+        if (userExists) {
+          let result = await userModel.findByIdAndUpdate(
+            { _id },
+            {
+              $push: {
+                documents: {
+                  name: imgName,
+                  reference: imgPath,
+                },
+              },
+            }
+          );
+          return result;
+        }
+        return "User not found";
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updateUserStatus(_id) {
+    try {
+      if (mongoose.Types.ObjectId.isValid(_id)) {
+        const userExists = await userModel.findById({ _id });
+
+        if (userExists) {
+          await userModel.findByIdAndUpdate(
+            { _id },
+            { status: "docsUploaded" }
+          );
+        }
+        return "User not found";
+      }
+    } catch (error) {
+      return error;
+    }
+  }
 }
