@@ -61,8 +61,6 @@ router.get(
   }
 );
 
-router.get("/cambiarpass", cambiararPass);
-
 router.get("/modificarpass", renderModificarPass);
 
 router.post("/modificarpass", modificarPass);

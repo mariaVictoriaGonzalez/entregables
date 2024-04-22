@@ -3,16 +3,25 @@ export default class UsersRepository {
     this.dao = dao;
   }
 
-  getUserByEmail = (email) => {
-    return this.dao.getUserByEmail({ email });
+  getUserByEmail = async (email) => {
+    try {
+      const user = await this.dao.getUserByEmail({email});
+      return user;
+    } catch (error) {
+      throw new Error(`Error while fetching user by email: ${error.message}`);
+    }
   };
 
-  modifyUser(email, password) {
-    const user = userModel.findOne({ email: email });
-
-    user.password = password;
-    user.save();
-
-    return user;
-  }
+  modifyUser = async (email, newPassword) => {
+    try {
+      let user = await this.dao.getUserByEmail({email});
+      user.password = newPassword;
+      user = await this.dao.modifyUser(user);
+      return user;
+    } catch (error) {
+      throw new Error(`Error while modifying user: ${error.message}`);
+    }
+  };
 }
+
+
