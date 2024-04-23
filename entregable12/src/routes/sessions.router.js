@@ -5,13 +5,12 @@ import {
   githubLogin,
   loginUser,
   logoutUser,
-  cambiararPass,
   registerUser,
   renderProfile,
   renderModificarPass,
-  modificarPass,
   mailDeModificarPass,
   cambioDePass,
+  renderCambioDePass,
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
@@ -66,6 +65,8 @@ router.get(
 router.get("/modificarpass", renderModificarPass);
 
 router.post("/modificarpass", mailDeModificarPass);
+
+router.get("/cambiodepass", passportCall("jwt"), renderCambioDePass)
 
 router.post("/cambiodepass", passportCall("jwt"), cambioDePass)
 

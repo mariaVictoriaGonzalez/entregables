@@ -1,3 +1,4 @@
+import config from "../config/config.js";
 import { usersService } from "../services/service.js";
 import { generateJWToken } from "../utils.js";
 import nodemailer from "nodemailer";
@@ -46,13 +47,19 @@ export const logoutUser = (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.error("Error al destruir la sesión:", err);
-        res.status(500).json({ status: "error", message: "Error al cerrar sesión" });
+        res
+          .status(500)
+          .json({ status: "error", message: "Error al cerrar sesión" });
       } else {
-        res.status(200).json({ status: "success", message: "Sesión cerrada exitosamente" });
+        res
+          .status(200)
+          .json({ status: "success", message: "Sesión cerrada exitosamente" });
       }
     });
   } else {
-    res.status(400).json({ status: "error", message: "No hay sesión activa para cerrar" });
+    res
+      .status(400)
+      .json({ status: "error", message: "No hay sesión activa para cerrar" });
   }
 };
 
@@ -84,7 +91,8 @@ export const cambiararPass = async (req, res) => {
       // Si no se encuentra el usuario, renderiza un mensaje indicando que el correo no fue encontrado
       return res.render("recoveryMessage", {
         title: "Recupero de contraseña",
-        message: "El correo electrónico no fue encontrado en nuestra base de datos.",
+        message:
+          "El correo electrónico no fue encontrado en nuestra base de datos.",
       });
     }
 
@@ -94,7 +102,8 @@ export const cambiararPass = async (req, res) => {
     // Renderiza un mensaje indicando que se ha enviado un correo electrónico de recuperación
     res.render("recoveryMessage", {
       title: "Recupero de contraseña",
-      message: "Se ha enviado un correo electrónico con instrucciones para recuperar tu contraseña.",
+      message:
+        "Se ha enviado un correo electrónico con instrucciones para recuperar tu contraseña.",
     });
   } catch (error) {
     console.error("Error:", error);
@@ -102,40 +111,14 @@ export const cambiararPass = async (req, res) => {
   }
 };
 
-const sendRecoveryMail = async (email) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    port: 587,
-    auth: {
-      user: config.gmailAccount,
-      pass: config.gmailAppPassword,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
-
-  transporter.verify(function (error, success) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Server is ready to send recovery email.");
-    }
-  });
-
-  const mailOptions = {
-    from: "Coder ecommerce - " + config.gmailAccount,
-    to: email, // Utiliza el correo electrónico pasado como argumento
-    subject: "Recuperar tu contraseña",
-    html: `<div><h1>Haz clic en el siguiente enlace para cambiar tu contraseña:</h1><br><a href="/api/sessions/modificarpass">Cambiar contraseña</a></div>`,
-    attachments: [],
-  };
-
+export const renderCambioDePass = async (req, res) => {
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Message sent: %s", info.messageId);
+    res.render("ingresodepassnueva", {
+      title: "Cambio de contraseña",
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Error:", error);
+    res.status(500).send("Error interno del servidor");
   }
 };
 
@@ -177,14 +160,13 @@ export const mailDeModificarPass = async (req, res) => {
   const mailOptions = {
     from: "Coder ecommerce - " + config.gmailAccount,
     to: email,
-    subject: 'Cambio de Contraseña',
-    html: `<h1>Cambio de Contraseña</h1><p>Haga clic en el siguiente enlace para cambiar su contraseña: <a href="http://tudominio.com/reset-password?token=${token}">Cambiar Contraseña</a></p>`
+    subject: "Cambio de Contraseña",
+    html: `<h1>Cambio de Contraseña</h1><p>Haga clic en el siguiente enlace para cambiar su contraseña: <a href="/api/sessions/cambiodepass">Cambiar Contraseña</a></p>`,
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("Message sent: %s", info.messageId);
-
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Error interno del servidor");
@@ -197,7 +179,9 @@ export const cambioDePass = async (req, res) => {
   try {
     // Verificar si la contraseña y la confirmación coinciden
     if (password !== confirmPassword) {
-      return res.status(400).json({ errorMessage: 'Las contraseñas no coinciden.' });
+      return res
+        .status(400)
+        .json({ errorMessage: "Las contraseñas no coinciden." });
     }
 
     // Verificar el token
@@ -207,19 +191,20 @@ export const cambioDePass = async (req, res) => {
     const user = await usersService.getUserByEmail({ email: userEmail });
 
     if (!user) {
-      return res.status(404).json({ errorMessage: 'Usuario no encontrado.' });
+      return res.status(404).json({ errorMessage: "Usuario no encontrado." });
     }
 
     user.password = password;
     await user.save();
 
-    res.status(200).json({ successMessage: 'Contraseña actualizada con éxito.' });
+    res
+      .status(200)
+      .json({ successMessage: "Contraseña actualizada con éxito." });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ errorMessage: 'Error interno del servidor.' });
+    res.status(500).json({ errorMessage: "Error interno del servidor." });
   }
 };
-
 
 export const renderProfile = async (req, res) => {
   try {
