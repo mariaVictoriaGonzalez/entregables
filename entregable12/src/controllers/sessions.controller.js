@@ -141,7 +141,7 @@ const sendRecoveryMail = async (email) => {
 
 export const renderModificarPass = async (req, res) => {
   try {
-    res.render("cambiarPass", {
+    res.render("maildecambiarPass", {
       title: "Cambio de contraseña",
     });
   } catch (error) {
@@ -150,24 +150,76 @@ export const renderModificarPass = async (req, res) => {
   }
 };
 
-export const modificarPass = async (req, res) => {
+export const mailDeModificarPass = async (req, res) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    port: 587,
+    auth: {
+      user: config.gmailAccount,
+      pass: config.gmailAppPassword,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Server is ready to send recovery email.");
+    }
+  });
+  const email = req.body.email;
+
+  const token = generateJWToken(email);
+
+  const mailOptions = {
+    from: "Coder ecommerce - " + config.gmailAccount,
+    to: email,
+    subject: 'Cambio de Contraseña',
+    html: `<h1>Cambio de Contraseña</h1><p>Haga clic en el siguiente enlace para cambiar su contraseña: <a href="http://tudominio.com/reset-password?token=${token}">Cambiar Contraseña</a></p>`
+  };
+
   try {
-    const email = req.body.email;
-    const newPassword = req.body.password;
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Message sent: %s", info.messageId);
 
-    // Modificar la contraseña del usuario
-    const usuario = await usersService.modifyUser(email, newPassword);
-
-    // Renderizar la vista con un mensaje de éxito
-    res.render("cambiarPass", {
-      title: "Cambio de contraseña",
-      message: "Se ha cambiado la contraseña con éxito.",
-    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Error interno del servidor");
   }
 };
+
+export const cambioDePass = async (req, res) => {
+  const { token, password, confirmPassword } = req.body;
+
+  try {
+    // Verificar si la contraseña y la confirmación coinciden
+    if (password !== confirmPassword) {
+      return res.status(400).json({ errorMessage: 'Las contraseñas no coinciden.' });
+    }
+
+    // Verificar el token
+    const decodedToken = jwt.verify(token, config.privateKey);
+    const userEmail = decodedToken.email;
+
+    const user = await usersService.getUserByEmail({ email: userEmail });
+
+    if (!user) {
+      return res.status(404).json({ errorMessage: 'Usuario no encontrado.' });
+    }
+
+    user.password = password;
+    await user.save();
+
+    res.status(200).json({ successMessage: 'Contraseña actualizada con éxito.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ errorMessage: 'Error interno del servidor.' });
+  }
+};
+
 
 export const renderProfile = async (req, res) => {
   try {

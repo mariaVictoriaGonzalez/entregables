@@ -10,6 +10,8 @@ import {
   renderProfile,
   renderModificarPass,
   modificarPass,
+  mailDeModificarPass,
+  cambioDePass,
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
@@ -63,7 +65,9 @@ router.get(
 
 router.get("/modificarpass", renderModificarPass);
 
-router.post("/modificarpass", modificarPass);
+router.post("/modificarpass", mailDeModificarPass);
+
+router.post("/cambiodepass", passportCall("jwt"), cambioDePass)
 
 router.get("/profile", passportCall("jwt"), renderProfile);
 
