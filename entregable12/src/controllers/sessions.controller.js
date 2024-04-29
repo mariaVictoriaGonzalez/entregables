@@ -82,35 +82,6 @@ export const githubLogin = async (req, res) => {
   res.redirect("/api/products");
 };
 
-export const cambiararPass = async (req, res) => {
-  try {
-    // Busca el correo electrónico en la base de datos
-    const usuario = await usersService.getUserByEmail(req.body.email);
-
-    if (!usuario) {
-      // Si no se encuentra el usuario, renderiza un mensaje indicando que el correo no fue encontrado
-      return res.render("recoveryMessage", {
-        title: "Recupero de contraseña",
-        message:
-          "El correo electrónico no fue encontrado en nuestra base de datos.",
-      });
-    }
-
-    // Llama a la función sendRecoveryMail y pasa el correo electrónico del usuario
-    await sendRecoveryMail(req.body.email);
-
-    // Renderiza un mensaje indicando que se ha enviado un correo electrónico de recuperación
-    res.render("recoveryMessage", {
-      title: "Recupero de contraseña",
-      message:
-        "Se ha enviado un correo electrónico con instrucciones para recuperar tu contraseña.",
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
-  }
-};
-
 export const renderCambioDePass = async (req, res) => {
   try {
     res.render("ingresodepassnueva", {
@@ -155,18 +126,27 @@ export const mailDeModificarPass = async (req, res) => {
   });
   const email = req.body.email;
 
-  const token = generateJWToken(email);
+  const changePassToken = generateJWToken(email);
+  console.log(changePassToken)
+
+  res.cookie("jwtCookieToken", changePassToken, {
+    maxAge: 100000,
+    httpOnly: true,
+  });
+
 
   const mailOptions = {
     from: "Coder ecommerce - " + config.gmailAccount,
     to: email,
     subject: "Cambio de Contraseña",
-    html: `<h1>Cambio de Contraseña</h1><p>Haga clic en el siguiente enlace para cambiar su contraseña: <a href="/api/sessions/cambiodepass">Cambiar Contraseña</a></p>`,
+    html: `<h1>Cambio de Contraseña</h1><p>Haga clic en el siguiente enlace para cambiar su contraseña: <a href="http://localhost:8080/api/sessions/cambiodepass">Cambiar Contraseña</a></p>`,
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("Message sent: %s", info.messageId);
+    res.redirect("/api/users/login");
+
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Error interno del servidor");
@@ -174,8 +154,8 @@ export const mailDeModificarPass = async (req, res) => {
 };
 
 export const cambioDePass = async (req, res) => {
-  const { token, password, confirmPassword } = req.body;
-
+  const { password, confirmPassword } = req.body;
+  
   try {
     // Verificar si la contraseña y la confirmación coinciden
     if (password !== confirmPassword) {
@@ -184,16 +164,21 @@ export const cambioDePass = async (req, res) => {
         .json({ errorMessage: "Las contraseñas no coinciden." });
     }
 
-    // Verificar el token
-    const decodedToken = jwt.verify(token, config.privateKey);
+    // Extraer el token de la cookie
+    const changePassToken = req.cookies.jwtCookieToken;
+
+    // Verificar y decodificar el token
+    const decodedToken = jwt.verify(changePassToken, config.privateKey);
     const userEmail = decodedToken.email;
 
+    // Buscar el usuario en la base de datos por el email
     const user = await usersService.getUserByEmail({ email: userEmail });
 
     if (!user) {
       return res.status(404).json({ errorMessage: "Usuario no encontrado." });
     }
 
+    // Actualizar la contraseña del usuario
     user.password = password;
     await user.save();
 
