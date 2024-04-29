@@ -2,6 +2,8 @@ import config from "../config/config.js";
 import { usersService } from "../services/service.js";
 import { generateJWToken } from "../utils.js";
 import nodemailer from "nodemailer";
+import jwt from 'jsonwebtoken';
+
 
 export const registerUser = async (req, res) => {
   try {
@@ -105,6 +107,16 @@ export const renderModificarPass = async (req, res) => {
 };
 
 export const mailDeModificarPass = async (req, res) => {
+  const email = req.body.email;
+
+  const changePassToken = generateJWToken(email);
+  console.log(changePassToken)
+
+  res.cookie("jwtCookieToken", changePassToken, {
+    maxAge: 100000,
+    httpOnly: true,
+  });
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     port: 587,
@@ -123,15 +135,6 @@ export const mailDeModificarPass = async (req, res) => {
     } else {
       console.log("Server is ready to send recovery email.");
     }
-  });
-  const email = req.body.email;
-
-  const changePassToken = generateJWToken(email);
-  console.log(changePassToken)
-
-  res.cookie("jwtCookieToken", changePassToken, {
-    maxAge: 100000,
-    httpOnly: true,
   });
 
 
@@ -169,10 +172,12 @@ export const cambioDePass = async (req, res) => {
 
     // Verificar y decodificar el token
     const decodedToken = jwt.verify(changePassToken, config.privateKey);
+
+    // Extraer el email del token decodificado
     const userEmail = decodedToken.email;
 
     // Buscar el usuario en la base de datos por el email
-    const user = await usersService.getUserByEmail({ email: userEmail });
+    const user = await usersService.getUserByEmail(userEmail);
 
     if (!user) {
       return res.status(404).json({ errorMessage: "Usuario no encontrado." });
@@ -180,10 +185,12 @@ export const cambioDePass = async (req, res) => {
 
     // Actualizar la contraseña del usuario
     user.password = password;
-    await user.save();
+    await usersService.modifyUser(user);
 
+    // Redirigir al usuario después de actualizar la contraseña
     res
       .status(200)
+      .redirect("/api/users/login")
       .json({ successMessage: "Contraseña actualizada con éxito." });
   } catch (error) {
     console.error(error);
