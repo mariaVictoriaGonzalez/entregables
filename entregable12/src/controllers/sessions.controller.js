@@ -171,10 +171,11 @@ export const cambioDePass = async (req, res) => {
     const changePassToken = req.cookies.jwtCookieToken;
 
     // Verificar y decodificar el token
-    const decodedToken = jwt.verify(changePassToken, config.privateKey);
+    const modifiedUser = jwt.verify(changePassToken, config.privateKey);
 
     // Extraer el email del token decodificado
-    const userEmail = decodedToken.email;
+    const userEmail = modifiedUser.user;
+    console.log(userEmail)
 
     // Buscar el usuario en la base de datos por el email
     const user = await usersService.getUserByEmail(userEmail);
@@ -185,13 +186,12 @@ export const cambioDePass = async (req, res) => {
 
     // Actualizar la contraseña del usuario
     user.password = password;
-    await usersService.modifyUser(user);
+    await user.save();
 
     // Redirigir al usuario después de actualizar la contraseña
     res
       .status(200)
       .redirect("/api/users/login")
-      .json({ successMessage: "Contraseña actualizada con éxito." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ errorMessage: "Error interno del servidor." });
