@@ -11,6 +11,7 @@ import {
   mailDeModificarPass,
   cambioDePass,
   renderCambioDePass,
+  changeToPremium,
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
@@ -72,7 +73,7 @@ router.post("/cambiodepass", passportCall("jwt"), cambioDePass)
 
 router.get("/profile", passportCall("jwt"), renderProfile);
 
-router.put("/changetopremium", )
+router.put("/changetopremium", changeToPremium)
 
 router.get("/github/login", (req, res) => {
   res.render("githubLogin");
