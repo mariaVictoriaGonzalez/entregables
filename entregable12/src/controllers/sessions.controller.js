@@ -3,6 +3,7 @@ import { usersService } from "../services/service.js";
 import { generateJWToken } from "../utils.js";
 import nodemailer from "nodemailer";
 import jwt from 'jsonwebtoken';
+import bcrypt from "bcrypt";
 
 
 export const registerUser = async (req, res) => {
@@ -184,8 +185,9 @@ export const cambioDePass = async (req, res) => {
       return res.status(404).json({ errorMessage: "Usuario no encontrado." });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     // Actualizar la contraseña del usuario
-    user.password = password;
+    user.password = hashedPassword;
     await user.save();
 
     // Redirigir al usuario después de actualizar la contraseña
