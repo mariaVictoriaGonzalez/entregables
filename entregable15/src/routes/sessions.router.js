@@ -5,11 +5,13 @@ import {
   githubLogin,
   loginUser,
   logoutUser,
-  cambiararPass,
   registerUser,
   renderProfile,
   renderModificarPass,
-  modificarPass,
+  mailDeModificarPass,
+  renderCambioDePass,
+  cambioDePass,
+  changeToPremium,
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
@@ -61,15 +63,17 @@ router.get(
   }
 );
 
-router.get("/cambiarpass", cambiararPass);
-
 router.get("/modificarpass", renderModificarPass);
 
-router.post("/modificarpass", modificarPass);
+router.post("/modificarpass", mailDeModificarPass);
+
+router.get("/cambiodepass", passportCall("jwt"), renderCambioDePass)
+
+router.post("/cambiodepass", passportCall("jwt"), cambioDePass)
 
 router.get("/profile", passportCall("jwt"), renderProfile);
 
-router.put("/changetopremium", )
+router.put("/changetopremium", changeToPremium)
 
 router.get("/github/login", (req, res) => {
   res.render("githubLogin");

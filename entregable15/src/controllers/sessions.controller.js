@@ -23,8 +23,8 @@ export const loginUser = async (req, res) => {
     const tokenUser = {
       name: `${user.first_name} ${user.last_name}`,
       email: user.email,
-      age: user.age,
       role: user.role,
+      _id: user._id
     };
     const access_token = generateJWToken(tokenUser);
     console.log(access_token);
@@ -67,8 +67,8 @@ export const githubLogin = async (req, res) => {
   const tokenUser = {
     name: `${user.first_name} ${user.last_name}`,
     email: user.email,
-    age: user.age,
     role: user.role,
+    _id: user._id
   };
   const access_token = generateJWToken(tokenUser);
   console.log(access_token);
@@ -80,38 +80,39 @@ export const githubLogin = async (req, res) => {
   res.redirect("/api/products");
 };
 
-export const cambiararPass = async (req, res) => {
+export const renderCambioDePass = async (req, res) => {
   try {
-    // Busca el correo electrónico en la base de datos
-    const usuario = await usersService.getUserByEmail({
-      email: req.body.email,
-    });
-
-    if (!usuario) {
-      // Si no se encuentra el usuario, renderiza un mensaje indicando que el correo no fue encontrado
-      return res.render("recoveryMessage", {
-        title: "Recupero de contraseña",
-        message:
-          "El correo electrónico no fue encontrado en nuestra base de datos.",
-      });
-    }
-
-    // Llama a la función sendRecoveryMail y pasa el correo electrónico del usuario
-    await sendRecoveryMail(req, res, usuario.email);
-
-    // Renderiza un mensaje indicando que se ha enviado un correo electrónico de recuperación
-    res.render("recoveryMessage", {
-      title: "Recupero de contraseña",
-      message:
-        "Se ha enviado un correo electrónico con instrucciones para recuperar tu contraseña.",
+    res.render("ingresodepassnueva", {
+      title: "Cambio de contraseña",
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send("Error interno del servidor");
   }
 };
 
-const sendRecoveryMail = async (req, res, email) => {
+export const renderModificarPass = async (req, res) => {
+  try {
+    res.render("maildecambiarPass", {
+      title: "Cambio de contraseña",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error interno del servidor");
+  }
+};
+
+export const mailDeModificarPass = async (req, res) => {
+  const email = req.body.email;
+
+  const changePassToken = generateJWToken(email);
+  console.log(changePassToken)
+
+  res.cookie("jwtCookieToken", changePassToken, {
+    maxAge: 100000,
+    httpOnly: true,
+  });
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     port: 587,
@@ -132,49 +133,65 @@ const sendRecoveryMail = async (req, res, email) => {
     }
   });
 
+
   const mailOptions = {
     from: "Coder ecommerce - " + config.gmailAccount,
-    to: email, // Utiliza el correo electrónico pasado como argumento
-    subject: "Recuperar tu contraseña",
-    html: `<div><h1>Haz clic en el siguiente enlace para cambiar tu contraseña:</h1><br><a href="/api/sessions/modificarpass">Cambiar contraseña</a></div>`,
-    attachments: [],
+    to: email,
+    subject: "Cambio de Contraseña",
+    html: `<h1>Cambio de Contraseña</h1><p>Haga clic en el siguiente enlace para cambiar su contraseña: <a href="http://localhost:8080/api/sessions/cambiodepass">Cambiar Contraseña</a></p>`,
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("Message sent: %s", info.messageId);
+    res.redirect("/api/users/login");
+
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error interno del servidor");
+  }
+};
+
+export const cambioDePass = async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  
+  try {
+    // Verificar si la contraseña y la confirmación coinciden
+    if (password !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ errorMessage: "Las contraseñas no coinciden." });
+    }
+
+    // Extraer el token de la cookie
+    const changePassToken = req.cookies.jwtCookieToken;
+
+    // Verificar y decodificar el token
+    const modifiedUser = jwt.verify(changePassToken, config.privateKey);
+
+    // Extraer el email del token decodificado
+    const userEmail = modifiedUser.user;
+    console.log(userEmail)
+
+    // Buscar el usuario en la base de datos por el email
+    const user = await usersService.getUserByEmail(userEmail);
+
+    if (!user) {
+      return res.status(404).json({ errorMessage: "Usuario no encontrado." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // Actualizar la contraseña del usuario
+    user.password = hashedPassword;
+    await user.save();
+
+    // Redirigir al usuario después de actualizar la contraseña
+    res
+      .status(200)
+      .redirect("/api/users/login")
   } catch (error) {
     console.error(error);
-  }
-};
-
-export const renderModificarPass = async (req, res) => {
-  try {
-    res.render("cambiarPass", {
-      title: "Cambio de contraseña",
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Error interno del servidor");
-  }
-};
-
-export const modificarPass = async (req, res) => {
-  try {
-    const email = req.body.email;
-    const newPassword = req.body.password;
-
-    // Modificar la contraseña del usuario
-    const usuario = await usersService.modifyUser(email, newPassword);
-
-    // Renderizar la vista con un mensaje de éxito
-    res.render("cambiarPass", {
-      title: "Cambio de contraseña",
-      message: "Se ha cambiado la contraseña con éxito.",
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Error interno del servidor");
+    res.status(500).json({ errorMessage: "Error interno del servidor." });
   }
 };
 
@@ -210,7 +227,7 @@ export const changeToPremium = async (req, res) => {
 
     user.role = "premium";
 
-    await usersService.modifyUser(user);
+    await user.save();
 
     return res.redirect("/login");
   } catch (error) {
