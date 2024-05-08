@@ -12,6 +12,7 @@ import {
   renderCambioDePass,
   cambioDePass,
   changeToPremium,
+  renderChangeToPremium,
 } from "../controllers/sessions.controller.js";
 
 const router = Router();
@@ -72,6 +73,8 @@ router.get("/cambiodepass", passportCall("jwt"), renderCambioDePass)
 router.post("/cambiodepass", passportCall("jwt"), cambioDePass)
 
 router.get("/profile", passportCall("jwt"), renderProfile);
+
+router.get("/changetopremium", renderChangeToPremium)
 
 router.put("/changetopremium", changeToPremium)
 

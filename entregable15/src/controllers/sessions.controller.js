@@ -215,77 +215,43 @@ export const renderProfile = async (req, res) => {
   }
 };
 
+export const renderChangeToPremium = async (req, res) => {
+  res.render("isitpremium", {
+    title: "Premium",
+  });
+
+}
+
 export const changeToPremium = async (req, res) => {
   try {
-    const { email } = req.user;
+    const { uid } = req.params;
+    const { folder } = req.body;
+    const file = req.file;
 
-    const user = await usersService.getUserByEmail(email);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!file) {
+      return res.status(400).send({ status: "error", message: "No se adjuntó ningún archivo." });
     }
 
-    user.role = "premium";
+    // Lógica para actualizar el usuario con la imagen subida
+    const imgPath = file.path;
+    const imgName = file.originalname;
 
-    await user.save();
+    await usersService.updateUserFiles(uid, imgName, imgPath);
 
-    return res.redirect("/login");
+    // Verifica si el usuario ha subido las tres imágenes requeridas
+    const imageCount = await usersService.getUserImageCount(uid);
+    if (imageCount.profile >= 1 && imageCount.products >= 1 && imageCount.documents >= 1) {
+      // Cambiar el rol del usuario a "premium"
+      await usersService.updateUserStatus(uid);
+
+      // Obtener y enviar el usuario actualizado como respuesta
+      const user = await usersService.getUserById(uid);
+      return res.status(200).json({ user });
+    }
+
+    res.status(200).json({ message: "Imagen subida con éxito." });
   } catch (error) {
     console.error("Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Error interno del servidor" });
   }
-};
-
-export const uploadFiles = async (req, res) => {
-  const { uid } = req.params;
-  const { folder } = req.params;
-  const uploadedFiles = req.files;
-  const user = req.user;
-
-  if (!req.files) {
-    return res
-      .status(400)
-      .send({ status: "error", mensaje: "No se adjunto archivo." });
-  }
-
-  if (folder === "profile") {
-    uploadedFiles.forEach((file) => {
-      const imgPath = file.path;
-      const imgName = file.originalname;
-
-      usersService.updateUserFiles(uid, imgName, imgPath);
-    });
-    req.logger.info("Imagen subida a profile");
-  } else if (folder === "products") {
-    uploadedFiles.forEach((file) => {
-      const imgPath = file.path;
-      const imgName = file.originalname;
-
-      usersService.updateUserFiles(uid, imgName, imgPath);
-    });
-    req.logger.info("Imágenes subida a products");
-  } else if (folder === "documents" && uploadedFiles.length === 3) {
-    uploadedFiles.forEach((file) => {
-      const imgPath = file.path;
-      const imgName = file.originalname;
-
-      usersService.updateUserFiles(uid, imgName, imgPath);
-    });
-  
-  usersService.updateUserStatus(uid);
-
-    req.logger.info("Imágenes subida a documents");
-  } else {
-    req.logger.info("Destino desconocido");
-  }
-
-  const access_token = generateJWToken(user);
-  res.cookie("jwtCookieToken", access_token, {
-    maxAge: 600000,
-    httpOnly: true,
-  });
-  res.send({
-    status: "success",
-    message: "imagenes subidas con éxito"
-  });
 };
