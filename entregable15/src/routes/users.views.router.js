@@ -18,12 +18,4 @@ router.get("/:uid", (req, res) => {
   res.render("isItPremium")
 })
 
-router.get("/:uid/documents", (req, res) => {
-  res.render("imageForm")
-})
-
-router.post("/:uid/documents", (req, res) => {
-})
-
-
 export default router;
